@@ -253,6 +253,8 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
 	    invoke SetBkMode,mDC,TRANSPARENT
 	    invoke SetTextColor,mDC,0000000h
 
+        push ebx
+        push edx
         mov edx,prebirdLife2
         mov esi,prebirdLife
         .if esi > edx
@@ -262,7 +264,8 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
         .else 
             mov whowin,3
         .endif
-
+        pop edx
+        pop ebx
         
         .if isFirst == 0
             .if whowin==1
