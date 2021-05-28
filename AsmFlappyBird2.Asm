@@ -703,13 +703,11 @@ Random endp
 SetupFly proc uses eax
     inc rseed
     ; set bird
-    mov birdX, 63
-    mov birdY, 200
+    mov birdX, 127
+    mov birdY, 168
 
-    ;new
-    mov birdX2, 63
-    mov birdY2, 200
-    ;new
+    mov birdX2, 127
+    mov birdY2, 168
 
     mov eax, jumpAc
     mov birdAc, eax
