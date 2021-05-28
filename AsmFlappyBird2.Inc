@@ -81,7 +81,7 @@ lostStr db 'You Lost!',0ah,0
 
 .data?
 
-couthelp byte '请输入两个整数：',0ah,0
+couthelp byte '请输入两�?整数�?',0ah,0
 hInstance			dd ?
 CommandLine			dd ?
 hWnd				dd ?
@@ -119,11 +119,11 @@ rseed				dd ?
 ; Tube:
 ; switch when the first disappear
 ;维护两根管子
-upTube              OBJECT 2 dup(<>)
-downTube            OBJECT 2 dup(<>)
+upTube              OBJECT 4 dup(<>)
+downTube            OBJECT 4 dup(<>)
 
-upTube2             OBJECT 2 dup(<>)
-downTube2           OBJECT 2 dup(<>)
+upTube2             OBJECT 4 dup(<>)
+downTube2           OBJECT 4 dup(<>)
 
 ; Bottom (Ground)
 bottomY             dd 384
@@ -137,13 +137,13 @@ bottomX2             dd 0
 ; birdY = min(max(birdAC + birdAC, 0), birdBottom)
 ; If hit the buttom, birdAc = jumpAc
 
-; 鸟位置信息
+; 鸟位�?信息
 birdX               dd ?
 birdY               dd ?
 birdX2              dd ?	; new
 birdY2              dd ?	 
 
-; 鸟生命值
+; 鸟生命�?
 birdLife			sdword ?
 birdLife2			sdword ?
 prebirdLife			sdword ?
@@ -162,7 +162,7 @@ gravityAc2           dd 2
 jumpAc              dd -14
 jumpAc2              dd -14
 
-cflap               dd 1	; 鸟切换
+cflap               dd 1	; 鸟切�?
 cflapDir            dd 0
 
 addedFlag           dd 0	; 柱子更新

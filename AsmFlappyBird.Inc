@@ -99,12 +99,12 @@ rseed				dd ?
 
 ; Tube:
 ; switch when the first disappear
-;维护两根管子
-upTube              OBJECT 2 dup(<>)
-downTube            OBJECT 2 dup(<>)
+;维护四根管子
+upTube              OBJECT 4 dup(<>)
+downTube            OBJECT 4 dup(<>)
 
-upTube2             OBJECT 2 dup(<>)
-downTube2           OBJECT 2 dup(<>)
+upTube2             OBJECT 4 dup(<>)
+downTube2           OBJECT 4 dup(<>)
 
 ; Bottom (Ground)
 bottomY             dd 384

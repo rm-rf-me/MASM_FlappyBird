@@ -117,7 +117,7 @@ WndProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 		invoke DeleteObject,hBmp
 
 		; Load bar image
-		invoke ImageList_Create,336,112,ILC_COLOR16,1,0
+		invoke ImageList_Create,676,112,ILC_COLOR16,1,0
 		mov		barIml,eax
 		invoke LoadBitmap,hInstance,IDB_BAR
 		mov		hBmp,eax
@@ -233,7 +233,7 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
 
 	invoke CreateCompatibleDC,hDC
 	mov		mDC,eax
-	invoke CreateCompatibleBitmap,hDC,288,500
+	invoke CreateCompatibleBitmap,hDC,288+288,500
 	invoke SelectObject,mDC,eax
 	push	eax
 	mov		rect.left,0
@@ -305,11 +305,27 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
         .if [ebx].OBJECT.x < 288 || [ebx].OBJECT.x <= -1
 	        invoke ImageList_Draw, tubeIml, 0, mDC, [ebx].OBJECT.x, [ebx].OBJECT.y, ILD_TRANSPARENT
 	    .endif
+        add ebx, sizeof OBJECT
+        .if [ebx].OBJECT.x < 288 || [ebx].OBJECT.x <= -1
+	        invoke ImageList_Draw, tubeIml, 0, mDC, [ebx].OBJECT.x, [ebx].OBJECT.y, ILD_TRANSPARENT
+	    .endif
+        add ebx, sizeof OBJECT
+        .if [ebx].OBJECT.x < 288 || [ebx].OBJECT.x <= -1
+	        invoke ImageList_Draw, tubeIml, 0, mDC, [ebx].OBJECT.x, [ebx].OBJECT.y, ILD_TRANSPARENT
+	    .endif
 
- 	    mov ebx, offset downTube 	    
+ 	    mov ebx, offset downTube	    
  	    .if [ebx].OBJECT.x < 288 || [ebx].OBJECT.x <= -1
 	        invoke ImageList_Draw, tubeIml, 1, mDC, [ebx].OBJECT.x, [ebx].OBJECT.y, ILD_TRANSPARENT
 	    .endif
+        add ebx, sizeof OBJECT
+        .if [ebx].OBJECT.x < 288 || [ebx].OBJECT.x <= -1
+            invoke ImageList_Draw, tubeIml, 1, mDC, [ebx].OBJECT.x, [ebx].OBJECT.y, ILD_TRANSPARENT
+        .endif
+        add ebx, sizeof OBJECT
+        .if [ebx].OBJECT.x < 288 || [ebx].OBJECT.x <= -1
+            invoke ImageList_Draw, tubeIml, 1, mDC, [ebx].OBJECT.x, [ebx].OBJECT.y, ILD_TRANSPARENT
+        .endif
         add ebx, sizeof OBJECT
         .if [ebx].OBJECT.x < 288 || [ebx].OBJECT.x <= -1
             invoke ImageList_Draw, tubeIml, 1, mDC, [ebx].OBJECT.x, [ebx].OBJECT.y, ILD_TRANSPARENT
@@ -390,13 +406,14 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
 	; Draw bottom
 	mov eax, speed
 	sub bottomX, eax
-	.if bottomX < -47
+	.if bottomX < -48
 	    mov bottomX, 0
 	.endif
+
 	invoke ImageList_Draw, barIml, 0, mDC, bottomX, bottomY, ILD_TRANSPARENT
 	
 	invoke GetClientRect,hWin,addr rect
-	invoke StretchBlt,hDC,0,0,rect.right,rect.bottom,mDC,0,0,288,500,SRCCOPY
+	invoke StretchBlt,hDC,0,0,rect.right,rect.bottom,mDC,0,0,288+288,500,SRCCOPY
 	pop		eax
 	invoke SelectObject,mDC,eax
 	invoke DeleteObject,eax
@@ -417,7 +434,7 @@ PaintBoard2 proc uses ebx esi,hWin:HWND,hDC:HDC
 
 	invoke CreateCompatibleDC,hDC
 	mov		mDC,eax
-	invoke CreateCompatibleBitmap,hDC,288,500
+	invoke CreateCompatibleBitmap,hDC,288+288,500
 	invoke SelectObject,mDC,eax
 	push	eax
 	mov		rect.left,288
@@ -485,6 +502,14 @@ PaintBoard2 proc uses ebx esi,hWin:HWND,hDC:HDC
         .if [ebx].OBJECT.x < 288 || [ebx].OBJECT.x <= -1
 	        invoke ImageList_Draw, tubeIml, 0, mDC, [ebx].OBJECT.x, [ebx].OBJECT.y, ILD_TRANSPARENT
 	    .endif
+        add ebx, sizeof OBJECT
+        .if [ebx].OBJECT.x < 288 || [ebx].OBJECT.x <= -1
+	        invoke ImageList_Draw, tubeIml, 0, mDC, [ebx].OBJECT.x, [ebx].OBJECT.y, ILD_TRANSPARENT
+	    .endif
+        add ebx, sizeof OBJECT
+        .if [ebx].OBJECT.x < 288 || [ebx].OBJECT.x <= -1
+	        invoke ImageList_Draw, tubeIml, 0, mDC, [ebx].OBJECT.x, [ebx].OBJECT.y, ILD_TRANSPARENT
+	    .endif
 
  	    mov ebx, offset downTube2 	    
  	    .if [ebx].OBJECT.x < 288 || [ebx].OBJECT.x <= -1
@@ -494,6 +519,15 @@ PaintBoard2 proc uses ebx esi,hWin:HWND,hDC:HDC
         .if [ebx].OBJECT.x < 288 || [ebx].OBJECT.x <= -1
             invoke ImageList_Draw, tubeIml, 1, mDC, [ebx].OBJECT.x, [ebx].OBJECT.y, ILD_TRANSPARENT
         .endif
+        add ebx, sizeof OBJECT
+        .if [ebx].OBJECT.x < 288 || [ebx].OBJECT.x <= -1
+            invoke ImageList_Draw, tubeIml, 1, mDC, [ebx].OBJECT.x, [ebx].OBJECT.y, ILD_TRANSPARENT
+        .endif
+        add ebx, sizeof OBJECT
+        .if [ebx].OBJECT.x < 288 || [ebx].OBJECT.x <= -1
+            invoke ImageList_Draw, tubeIml, 1, mDC, [ebx].OBJECT.x, [ebx].OBJECT.y, ILD_TRANSPARENT
+        .endif
+
 	    pop ebx
 	    ; end draw tube
         
@@ -579,7 +613,7 @@ PaintBoard2 proc uses ebx esi,hWin:HWND,hDC:HDC
 	invoke ImageList_Draw, barIml, 0, mDC, bottomX2, bottomY2, ILD_TRANSPARENT
 	
 	invoke GetClientRect,hWin,addr rect
-	invoke StretchBlt,hDC,0,0,rect.right,rect.bottom,mDC,0,0,288,500,SRCCOPY
+	invoke StretchBlt,hDC,0,0,rect.right,rect.bottom,mDC,0,0,288+288,500,SRCCOPY
 	pop		eax
 	invoke SelectObject,mDC,eax
 	invoke DeleteObject,eax
@@ -734,8 +768,8 @@ SetupFly proc uses eax
     push edx
     mov ebx, offset upTube
     mov edx, offset downTube
-    mov [ebx].OBJECT.x, 576 ;第一组
-    mov [edx].OBJECT.x, 576
+    mov [ebx].OBJECT.x, 756 ;第一组
+    mov [edx].OBJECT.x, 756
     invoke Random, 160
     add eax, 195
     mov [edx].OBJECT.y, eax
@@ -745,19 +779,38 @@ SetupFly proc uses eax
 
     add ebx, sizeof OBJECT ;第二组
     add edx, sizeof OBJECT
-    mov [ebx].OBJECT.x, 756   ;+200
-    mov [edx].OBJECT.x, 756
+    mov [ebx].OBJECT.x, 956   ;+200
+    mov [edx].OBJECT.x, 956
+    invoke Random, 160
+    add eax, 195
+    mov [edx].OBJECT.y, eax
+    sub eax, 450
+    mov [ebx].OBJECT.y, eax
+
+    add ebx, sizeof OBJECT ;第三组
+    add edx, sizeof OBJECT
+    mov [ebx].OBJECT.x, 1156   ;+200
+    mov [edx].OBJECT.x, 1156
+    invoke Random, 160
+    add eax, 195
+    mov [edx].OBJECT.y, eax
+    sub eax, 450
+    mov [ebx].OBJECT.y, eax
+
+    add ebx, sizeof OBJECT ;第四组
+    add edx, sizeof OBJECT
+    mov [ebx].OBJECT.x, 1356   ;+200
+    mov [edx].OBJECT.x, 1356
     invoke Random, 160
     add eax, 195
     mov [edx].OBJECT.y, eax
     sub eax, 450
     mov [ebx].OBJECT.y, eax
     
-
     mov ebx, offset upTube2
     mov edx, offset downTube2
-    mov [ebx].OBJECT.x, 576 ;第一组
-    mov [edx].OBJECT.x, 576
+    mov [ebx].OBJECT.x, 756 ;第一组
+    mov [edx].OBJECT.x, 756
     invoke Random, 160
     add eax, 195
     mov [edx].OBJECT.y, eax
@@ -767,8 +820,28 @@ SetupFly proc uses eax
 
     add ebx, sizeof OBJECT ;第二组
     add edx, sizeof OBJECT
-    mov [ebx].OBJECT.x, 756   ;+200
-    mov [edx].OBJECT.x, 756
+    mov [ebx].OBJECT.x, 956   ;+200
+    mov [edx].OBJECT.x, 956
+    invoke Random, 160
+    add eax, 195
+    mov [edx].OBJECT.y, eax
+    sub eax, 450
+    mov [ebx].OBJECT.y, eax
+
+    add ebx, sizeof OBJECT ;第三组
+    add edx, sizeof OBJECT
+    mov [ebx].OBJECT.x, 1156   ;+200
+    mov [edx].OBJECT.x, 1156
+    invoke Random, 160
+    add eax, 195
+    mov [edx].OBJECT.y, eax
+    sub eax, 450
+    mov [ebx].OBJECT.y, eax
+
+    add ebx, sizeof OBJECT ;第四组
+    add edx, sizeof OBJECT
+    mov [ebx].OBJECT.x, 1356   ;+200
+    mov [edx].OBJECT.x, 1356
     invoke Random, 160
     add eax, 195
     mov [edx].OBJECT.y, eax
@@ -787,8 +860,8 @@ InitParam proc
     mov NormSpeed, 4
     mov NormAravityAc, 2
     mov NormJumpAc, -14
-    mov birdLife, 10
-    mov birdLife2, 10
+    mov birdLife, 100
+    mov birdLife2, 100
     mov speed, 4
     mov speed2, 4
     mov bottomY, 387
@@ -959,8 +1032,9 @@ SetupDie2 proc uses eax,target:dword
             push edx
             mov ebx, offset upTube
             mov edx, offset downTube
-            mov [ebx].OBJECT.x, 276 ;第一组
-            mov [edx].OBJECT.x, 276
+
+            mov [ebx].OBJECT.x, 456 ;第一组
+            mov [edx].OBJECT.x, 456
             invoke Random, 160
             add eax, 195
             mov [edx].OBJECT.y, eax
@@ -970,8 +1044,28 @@ SetupDie2 proc uses eax,target:dword
 
             add ebx, sizeof OBJECT ;第二组
             add edx, sizeof OBJECT
-            mov [ebx].OBJECT.x, 456   ;+200
-            mov [edx].OBJECT.x, 456
+            mov [ebx].OBJECT.x, 656   ;+200
+            mov [edx].OBJECT.x, 656
+            invoke Random, 160
+            add eax, 195
+            mov [edx].OBJECT.y, eax
+            sub eax, 450
+            mov [ebx].OBJECT.y, eax
+
+            add ebx, sizeof OBJECT ;第三组
+            add edx, sizeof OBJECT
+            mov [ebx].OBJECT.x, 856   ;+200
+            mov [edx].OBJECT.x, 856
+            invoke Random, 160
+            add eax, 195
+            mov [edx].OBJECT.y, eax
+            sub eax, 450
+            mov [ebx].OBJECT.y, eax
+
+            add ebx, sizeof OBJECT ;第四组
+            add edx, sizeof OBJECT
+            mov [ebx].OBJECT.x, 1056   ;+200
+            mov [edx].OBJECT.x, 1056
             invoke Random, 160
             add eax, 195
             mov [edx].OBJECT.y, eax
@@ -1006,8 +1100,9 @@ SetupDie2 proc uses eax,target:dword
             push edx
             mov ebx, offset upTube2
             mov edx, offset downTube2
-            mov [ebx].OBJECT.x, 276 ;第一组
-            mov [edx].OBJECT.x, 276
+            
+            mov [ebx].OBJECT.x, 456 ;第一组
+            mov [edx].OBJECT.x, 456
             invoke Random, 160
             add eax, 195
             mov [edx].OBJECT.y, eax
@@ -1017,8 +1112,28 @@ SetupDie2 proc uses eax,target:dword
 
             add ebx, sizeof OBJECT ;第二组
             add edx, sizeof OBJECT
-            mov [ebx].OBJECT.x, 456   ;+200
-            mov [edx].OBJECT.x, 456
+            mov [ebx].OBJECT.x, 656   ;+200
+            mov [edx].OBJECT.x, 656
+            invoke Random, 160
+            add eax, 195
+            mov [edx].OBJECT.y, eax
+            sub eax, 450
+            mov [ebx].OBJECT.y, eax
+
+            add ebx, sizeof OBJECT ;第三组
+            add edx, sizeof OBJECT
+            mov [ebx].OBJECT.x, 856   ;+200
+            mov [edx].OBJECT.x, 856
+            invoke Random, 160
+            add eax, 195
+            mov [edx].OBJECT.y, eax
+            sub eax, 450
+            mov [ebx].OBJECT.y, eax
+
+            add ebx, sizeof OBJECT ;第四组
+            add edx, sizeof OBJECT
+            mov [ebx].OBJECT.x, 1056   ;+200
+            mov [edx].OBJECT.x, 1056
             invoke Random, 160
             add eax, 195
             mov [edx].OBJECT.y, eax
@@ -1289,29 +1404,59 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [ebx].OBJECT.x, ecx    ;2号柱子转移到1号柱子
             mov ecx, [eax].OBJECT.y
             mov [ebx].OBJECT.y, ecx
+
+            mov ebx, eax
+            add eax, sizeof OBJECT
+            mov ecx, [eax].OBJECT.x
+            mov [ebx].OBJECT.x, ecx    ;3号柱子转移到2号柱子
+            mov ecx, [eax].OBJECT.y
+            mov [ebx].OBJECT.y, ecx
+
+            mov ebx, eax
+            add eax, sizeof OBJECT
+            mov ecx, [eax].OBJECT.x
+            mov [ebx].OBJECT.x, ecx    ;4号柱子转移到3号柱子
+            mov ecx, [eax].OBJECT.y
+            mov [ebx].OBJECT.y, ecx
+
             mov eax, edx
             add eax, sizeof OBJECT
             mov ecx, [eax].OBJECT.x
             mov [edx].OBJECT.x, ecx
             mov ecx, [eax].OBJECT.y
             mov [edx].OBJECT.y, ecx
+
+            mov edx, eax
+            add eax, sizeof OBJECT
+            mov ecx, [eax].OBJECT.x
+            mov [edx].OBJECT.x, ecx
+            mov ecx, [eax].OBJECT.y
+            mov [edx].OBJECT.y, ecx
+
+            mov edx, eax
+            add eax, sizeof OBJECT
+            mov ecx, [eax].OBJECT.x
+            mov [edx].OBJECT.x, ecx
+            mov ecx, [eax].OBJECT.y
+            mov [edx].OBJECT.y, ecx
+
             
             mov eax, [edx].OBJECT.x
-            add eax, 180
+            add eax, 200
             add ebx, sizeof OBJECT
             add edx, sizeof OBJECT
             mov [ebx].OBJECT.x, eax
-            mov [edx].OBJECT.y, eax
+            mov [edx].OBJECT.x, eax
             invoke Random, 160
             add eax, 195
             mov [edx].OBJECT.y, eax
             sub eax, 450
             mov [ebx].OBJECT.y, eax
             
-            mov addedFlag, 0
+            mov addedFlag2, 0
         .endif
 
-        mov ecx, 2
+        mov ecx, 4
         mov ebx, offset upTube
         mov edx, offset downTube
         
@@ -1402,19 +1547,49 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [ebx].OBJECT.x, ecx    ;2号柱子转移到1号柱子
             mov ecx, [eax].OBJECT.y
             mov [ebx].OBJECT.y, ecx
+
+            mov ebx, eax
+            add eax, sizeof OBJECT
+            mov ecx, [eax].OBJECT.x
+            mov [ebx].OBJECT.x, ecx    ;3号柱子转移到2号柱子
+            mov ecx, [eax].OBJECT.y
+            mov [ebx].OBJECT.y, ecx
+
+            mov ebx, eax
+            add eax, sizeof OBJECT
+            mov ecx, [eax].OBJECT.x
+            mov [ebx].OBJECT.x, ecx    ;4号柱子转移到3号柱子
+            mov ecx, [eax].OBJECT.y
+            mov [ebx].OBJECT.y, ecx
+
             mov eax, edx
             add eax, sizeof OBJECT
             mov ecx, [eax].OBJECT.x
             mov [edx].OBJECT.x, ecx
             mov ecx, [eax].OBJECT.y
             mov [edx].OBJECT.y, ecx
+
+            mov edx, eax
+            add eax, sizeof OBJECT
+            mov ecx, [eax].OBJECT.x
+            mov [edx].OBJECT.x, ecx
+            mov ecx, [eax].OBJECT.y
+            mov [edx].OBJECT.y, ecx
+
+            mov edx, eax
+            add eax, sizeof OBJECT
+            mov ecx, [eax].OBJECT.x
+            mov [edx].OBJECT.x, ecx
+            mov ecx, [eax].OBJECT.y
+            mov [edx].OBJECT.y, ecx
+
             
             mov eax, [edx].OBJECT.x
-            add eax, 180
+            add eax, 200
             add ebx, sizeof OBJECT
             add edx, sizeof OBJECT
             mov [ebx].OBJECT.x, eax
-            mov [edx].OBJECT.y, eax
+            mov [edx].OBJECT.x, eax
             invoke Random, 160
             add eax, 195
             mov [edx].OBJECT.y, eax
@@ -1424,7 +1599,7 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov addedFlag2, 0
         .endif
 
-        mov ecx, 2
+        mov ecx, 4
         mov ebx, offset upTube2
         mov edx, offset downTube2
         
