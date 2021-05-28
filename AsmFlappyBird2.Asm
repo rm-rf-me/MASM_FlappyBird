@@ -791,6 +791,7 @@ InitParam proc
     mov jumpAc, -14
     mov jumpAc2, -14
     mov cflap, 1
+    mov cflapDir, 0
     mov stateV, 179
     mov stateH, 0
     mov isAuto, 0
@@ -818,6 +819,7 @@ EndGame proc uses edx esi
         mov prebirdLife2,edx
     .endif
     invoke InitParam
+    invoke SetupFly
     ret
 EndGame endp
 
