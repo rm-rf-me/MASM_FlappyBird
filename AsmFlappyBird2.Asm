@@ -643,14 +643,14 @@ DeBuff endp
 DeBuff2 proc target:dword
     .if target==1 
         mov indebuf,1  ;debuf标记置位
-        mov speed, 6   ;加速
+        mov speed, 5   ;加速
         add gravityAc, 1 ;增加重力
         add jumpAc, -4  ;增加跳跃力度
     .endif
 
     .if target==2 
         mov indebuf2,1
-        mov speed2, 6
+        mov speed2, 5
         add gravityAc2, 1
         add jumpAc2, -4
     .endif
@@ -705,12 +705,20 @@ Random endp
 ;初始化游戏，鸟的位置，柱子的位置
 SetupFly proc uses eax
     inc rseed
-    ; set bird
-    mov birdX, 127
-    mov birdY, 168
 
-    mov birdX2, 127
-    mov birdY2, 168
+    ; new: 此时鸟放在左边，放在中间由timerproc控制，当游戏未开始时放在中间
+    ; set bird
+    ; mov birdX, 127
+    ; mov birdY, 168
+
+    ; mov birdX2, 127
+    ; mov birdY2, 168
+
+    mov birdX, 63
+    mov birdY, 200
+
+    mov birdX2, 63
+    mov birdY2, 200
 
     mov eax, jumpAc
     mov birdAc, eax
@@ -1439,7 +1447,14 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             invoke UpdateQ    
         .endif
         
+    ; new: 游戏未开始时鸟放在中间
+    .else
+        mov birdX, 127
+        mov birdY, 168
 
+        mov birdX2, 127
+        mov birdY2, 168
+    
     .endif
 	
     invoke InvalidateRect,hBoard,NULL,TRUE
