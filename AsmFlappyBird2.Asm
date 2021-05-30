@@ -653,26 +653,6 @@ BoardProc2 proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 
 BoardProc2 endp
 
-DeBuff proc 
-    .if whodie==1 
-        mov indebuf,1
-        ;.if speed2==4
-        mov speed, 6
-        add gravityAc, 1
-        add jumpAc, -4
-        ;.endif
-    .endif
-
-    .if whodie==2 
-        mov indebuf2,1
-        ;.if speed2==4
-        mov speed2, 6
-        add gravityAc2, 1
-        add jumpAc2, -4
-        ;.endif
-    .endif
-    ret
-DeBuff endp
 
 DeBuff2 proc target:dword
     .if target==1 
@@ -1453,7 +1433,7 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             sub eax, 450
             mov [ebx].OBJECT.y, eax
             
-            mov addedFlag2, 0
+            mov addedFlag, 0
         .endif
 
         mov ecx, 4
