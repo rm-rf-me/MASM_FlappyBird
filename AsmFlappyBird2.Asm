@@ -180,6 +180,21 @@ WndProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
                 mov isFirst,0
             .endif
         ;new
+        .elseif eax==VK_M
+            .if gStatus == 1
+			    .if Disturb2 > 0
+                    dec Disturb2
+                    invoke DeBuff2, 1
+                .endif
+			.endif
+
+        .elseif eax==VK_Z
+            .if gStatus == 1
+			    .if Disturb2 > 0
+                    dec Disturb2
+                    invoke DeBuff2, 2
+                .endif
+			.endif
 
 		.elseif eax==VK_A
 		    .if isAuto
@@ -335,13 +350,17 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
         
         ; 打印当前分数
 	    mov		wRect.left,0
-	    mov		wRect.top,65
+	    mov		wRect.top,80
 	    mov		wRect.right,288
 	    mov		wRect.bottom,500
 	    invoke SetBkMode,mDC,TRANSPARENT	    
 	    invoke SetTextColor,mDC,0ffffffh
 
+        ; skill
+        invoke wsprintfA, addr buffer, offset disturbStr, Disturb
+        invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER 
         ; life
+        sub		wRect.top,15
         invoke wsprintfA, addr buffer, offset lifeStr, birdLife
         invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER    
         ; now
@@ -533,13 +552,17 @@ PaintBoard2 proc uses ebx esi,hWin:HWND,hDC:HDC
         
         ; 打印当前分数
 	    mov		wRect.left,0
-	    mov		wRect.top,65
+	    mov		wRect.top,80
 	    mov		wRect.right,288
 	    mov		wRect.bottom,500
 	    invoke SetBkMode,mDC,TRANSPARENT
         invoke SetTextColor,mDC,0ffffffh
 
+        ; skill
+        invoke wsprintfA, addr buffer, offset disturbStr, Disturb2
+        invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER 
         ; life
+        sub		wRect.top,15
         invoke wsprintfA, addr buffer, offset lifeStr, birdLife2
         invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER    
         ; now
@@ -857,6 +880,10 @@ InitParam proc
     mov stateV, 179
     mov stateH, 0
     mov isAuto, 0
+    mov Disturb, 0
+    mov Disturb2, 0
+    mov FinDisturb, 0
+    mov FinDisturb2, 0
 
     mov indebuf,0
     mov indebuf2,0
@@ -1360,6 +1387,19 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             invoke ResetBuff,1
             mov reward, 2
             inc cPoint
+            ;;;;;;add skill
+            push edx
+            push ebx
+            mov eax, cPoint
+            mov edx, 0
+            mov ebx, DisturbMod
+            div ebx
+            .if edx == 0
+                inc Disturb
+            .endif
+            pop ebx
+            pop edx
+            ;;;;;;;
             inc totPoint;new
             mov addedFlag, 1
         .endif
@@ -1504,6 +1544,19 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             invoke ResetBuff,2
             mov reward, 2
             inc cPoint2
+            ;;;;;;add skill
+            push edx
+            push ebx
+            mov eax, cPoint2
+            mov edx, 0
+            mov ebx, DisturbMod
+            div ebx
+            .if edx == 0
+                inc Disturb2
+            .endif
+            pop ebx
+            pop edx
+            ;;;;;;;
             inc totPoint2;new
             mov addedFlag2, 1
         .endif

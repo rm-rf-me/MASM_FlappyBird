@@ -50,6 +50,9 @@ IDM_OPEN            equ 10002
 IDM_SAVE            equ 10003
 IDM_MODE            equ 10004
 
+DisturbMod			equ 3
+FinDisturbMod		equ 5
+
 MTIMER				equ 25  ;系统时钟
 
 OBJECT	struct
@@ -72,6 +75,8 @@ totFmtStr			db 'Tot: %lu', 0
 lifeStr				db 'Life: %lu', 0
 speedStr			db 'Speed: %lu', 0
 nowStr 				db 'Now: %lu', 0
+disturbStr 			db 'Skill: %lu', 0
+
 alpha_QL            REAL8 0.7
 MapSize             dd 60*30*2*(sizeof REAL8)
 szFile		        db	'fbai.model', 0
@@ -81,7 +86,7 @@ lostStr db 'You Lost!',0ah,0
 
 .data?
 
-couthelp byte '请输入两�?整数�?',0ah,0
+couthelp byte '请输入两�?整数�?',0ah,0
 hInstance			dd ?
 CommandLine			dd ?
 hWnd				dd ?
@@ -137,13 +142,13 @@ bottomX2             dd 0
 ; birdY = min(max(birdAC + birdAC, 0), birdBottom)
 ; If hit the buttom, birdAc = jumpAc
 
-; 鸟位�?信息
+; 鸟位�?信息
 birdX               dd ?
 birdY               dd ?
 birdX2              dd ?	; new
 birdY2              dd ?	 
 
-; 鸟生命�?
+; 鸟生命�?
 birdLife			sdword ?
 birdLife2			sdword ?
 prebirdLife			sdword ?
@@ -162,11 +167,16 @@ gravityAc2           dd 2
 jumpAc              dd -14
 jumpAc2              dd -14
 
-cflap               dd 1	; 鸟切�?
+cflap               dd 1	; 鸟切换
 cflapDir            dd 0
 
 addedFlag           dd 0	; 柱子更新
 addedFlag2          dd 0	; 柱子更新
+
+Disturb				dd 0	; bird的主动技能
+Disturb2			dd 0
+FinDisturb			dd 0
+FinDisturb2			dd 0
 
 vDistRangeL         dd ?
 vDistRangeR         dd ?
