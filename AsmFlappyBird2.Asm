@@ -678,15 +678,15 @@ DeBuff2 proc target:dword
     .if target==1 
         mov indebuf,1  ;debuf标记置位
         mov speed, 5   ;加速
-        add gravityAc, 1 ;增加重力
-        add jumpAc, -4  ;增加跳跃力度
+        mov gravityAc, 3 ;增加重力
+        mov jumpAc, -12  ;减少跳跃力度
     .endif
 
     .if target==2 
         mov indebuf2,1
         mov speed2, 5
-        add gravityAc2, 1
-        add jumpAc2, -4
+        mov gravityAc2, 3 ;增加重力
+        mov jumpAc2, -12  ;减少跳跃力度
     .endif
     ret
 DeBuff2 endp
