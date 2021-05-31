@@ -196,6 +196,20 @@ WndProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
                 .endif
 			.endif
 
+        .elseif eax==VK_L
+            .if gStatus == 1
+			    .if FinDisturb2 > 0
+                    mov inFinSkill2, 400
+                .endif
+			.endif
+
+        .elseif eax==VK_A
+            .if gStatus == 1
+			    .if FinDisturb > 0
+                    mov inFinSkill, 400
+                .endif
+			.endif
+
 		.elseif eax==VK_A
 		    .if isAuto
 		        mov isAuto, 0
@@ -350,13 +364,20 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
         
         ; 打印当前分数
 	    mov		wRect.left,0
-	    mov		wRect.top,80
+	    mov		wRect.top,95
 	    mov		wRect.right,288
 	    mov		wRect.bottom,500
 	    invoke SetBkMode,mDC,TRANSPARENT	    
-	    invoke SetTextColor,mDC,0ffffffh
 
+        ; fin skill
+        .if FinDisturb==1
+            invoke SetTextColor,mDC,0ff0000h
+            invoke wsprintfA, addr buffer, offset FinDisturbStr
+            invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER 
+        .endif
+        invoke SetTextColor,mDC,0ffffffh
         ; skill
+        sub		wRect.top,15
         invoke wsprintfA, addr buffer, offset disturbStr, Disturb
         invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER 
         ; life
@@ -552,12 +573,19 @@ PaintBoard2 proc uses ebx esi,hWin:HWND,hDC:HDC
         
         ; 打印当前分数
 	    mov		wRect.left,0
-	    mov		wRect.top,80
+	    mov		wRect.top,95
 	    mov		wRect.right,288
 	    mov		wRect.bottom,500
 	    invoke SetBkMode,mDC,TRANSPARENT
-        invoke SetTextColor,mDC,0ffffffh
 
+        ; fin skill
+        .if FinDisturb2==1
+            invoke SetTextColor,mDC,0ff0000h
+            invoke wsprintfA, addr buffer, offset FinDisturbStr2
+            invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER 
+        .endif
+        invoke SetTextColor,mDC,0ffffffh
+        sub		wRect.top,15
         ; skill
         invoke wsprintfA, addr buffer, offset disturbStr, Disturb2
         invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER 
@@ -884,6 +912,8 @@ InitParam proc
     mov Disturb2, 0
     mov FinDisturb, 0
     mov FinDisturb2, 0
+    mov inFinSkill, 0
+    mov inFinSkill2, 0
 
     mov indebuf,0
     mov indebuf2,0
@@ -1082,7 +1112,7 @@ SetupDie2 proc uses eax,target:dword
             pop edx
             pop ebx
             mov addedFlag, 0
-
+            mov FinDisturb, 0
             invoke DeBuff2,1
         .else
             invoke EndGame
@@ -1151,6 +1181,7 @@ SetupDie2 proc uses eax,target:dword
             pop ebx
             mov addedFlag2, 0
             invoke DeBuff2,2
+            mov FinDisturb2, 0
         .else
             invoke EndGame
         .endif
@@ -1397,6 +1428,13 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             .if edx == 0
                 inc Disturb
             .endif
+            mov eax, cPoint
+            mov edx, 0
+            mov ebx, FinDisturbMod
+            div ebx
+            .if edx == 0
+                mov FinDisturb, 1
+            .endif
             pop ebx
             pop edx
             ;;;;;;;
@@ -1469,8 +1507,13 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [edx].OBJECT.x, eax
             invoke Random, 160
             add eax, 195
+            mov ecx, inFinSkill
+            shr ecx, 1
+            add eax, ecx
             mov [edx].OBJECT.y, eax
             sub eax, 450
+            sub eax, ecx
+            sub eax, ecx
             mov [ebx].OBJECT.y, eax
             
             mov addedFlag, 0
@@ -1554,6 +1597,13 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             .if edx == 0
                 inc Disturb2
             .endif
+            mov eax, cPoint2
+            mov edx, 0
+            mov ebx, FinDisturbMod
+            div ebx
+            .if edx == 0
+                mov FinDisturb2, 1
+            .endif
             pop ebx
             pop edx
             ;;;;;;;
@@ -1623,10 +1673,16 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             add edx, sizeof OBJECT
             mov [ebx].OBJECT.x, eax
             mov [edx].OBJECT.x, eax
+            
             invoke Random, 160
             add eax, 195
+            mov ecx, inFinSkill
+            shr ecx, 1
+            add eax, ecx
             mov [edx].OBJECT.y, eax
             sub eax, 450
+            sub eax, ecx
+            sub eax, ecx
             mov [ebx].OBJECT.y, eax
             
             mov addedFlag2, 0

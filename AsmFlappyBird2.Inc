@@ -51,7 +51,7 @@ IDM_SAVE            equ 10003
 IDM_MODE            equ 10004
 
 DisturbMod			equ 3
-FinDisturbMod		equ 5
+FinDisturbMod		equ 1
 
 MTIMER				equ 25  ;系统时钟
 
@@ -76,6 +76,8 @@ lifeStr				db 'Life: %lu', 0
 speedStr			db 'Speed: %lu', 0
 nowStr 				db 'Now: %lu', 0
 disturbStr 			db 'Skill: %lu', 0
+FinDisturbStr		db 'Press A use final skill!', 0
+FinDisturbStr2		db 'Press L use final skill!', 0
 
 alpha_QL            REAL8 0.7
 MapSize             dd 60*30*2*(sizeof REAL8)
@@ -177,6 +179,8 @@ Disturb				dd 0	; bird的主动技能
 Disturb2			dd 0
 FinDisturb			dd 0
 FinDisturb2			dd 0
+inFinSkill			dd 0
+inFinSkill2			dd 0
 
 vDistRangeL         dd ?
 vDistRangeR         dd ?
