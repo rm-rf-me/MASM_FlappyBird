@@ -87,7 +87,7 @@ lostStr db 'You Lost!',0ah,0
 
 .data?
 
-couthelp byte '请输入两�?整数�?',0ah,0
+couthelp byte '请输入两�??整数�??',0ah,0
 hInstance			dd ?
 CommandLine			dd ?
 hWnd				dd ?
@@ -143,7 +143,7 @@ bottomX2             dd 0
 ; birdY = min(max(birdAC + birdAC, 0), birdBottom)
 ; If hit the buttom, birdAc = jumpAc
 
-; 鸟位�?信息
+; 鸟位�??信息
 birdX               dd ?
 birdY               dd ?
 birdX2              dd ?	; new
@@ -168,18 +168,23 @@ gravityAc2           dd 2
 jumpAc              dd -14
 jumpAc2              dd -14
 
-cflap               dd 1	; 鸟切换
+cflap               dd 1	; 鸟切�?
 cflapDir            dd 0
 
 addedFlag           dd 0	; 柱子更新
 addedFlag2          dd 0	; 柱子更新
 
-Disturb				dd 0	; bird的主动技能
+Disturb				dd 0	; bird的主动技�?
 Disturb2			dd 0
 FinDisturb			dd 0
 FinDisturb2			dd 0
 inFinSkill			dd 0
 inFinSkill2			dd 0
+
+changeBirdCou		dd 0
+changeBirdCou2		dd 0
+firstchange			dd 0
+firstchange2		dd 0
 
 debug               dd 0
 

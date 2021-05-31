@@ -705,20 +705,28 @@ ResetBuff proc target:dword
         .if indebuf==1
             .if speed>4
                 dec speed
-            .elseif
+            .elseif firstchange==1&&changeBirdCou==0
                 mov gravityAc, 2
                 mov jumpAc, -14
                 mov indebuf,0
+                mov firstchange, 0
+            .elseif   firstchange==0
+                mov firstchange, 1
+                mov changeBirdCou, 80
             .endif
         .endif
     .elseif target==2
         .if indebuf2==1
             .if speed2>4
                 dec speed2
-            .elseif
+            .elseif firstchange2==1&&changeBirdCou2==0
                 mov gravityAc2, 2
                 mov jumpAc2, -14
                 mov indebuf2,0
+                mov firstchange2, 0
+            .elseif   firstchange2==0
+                mov firstchange2, 1
+                mov changeBirdCou2, 80
             .endif
         .endif
     .endif
@@ -1126,7 +1134,7 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
         mov eax, [ebx].OBJECT.x
 
         .if eax < birdX && addedFlag == 0
-            invoke ResetBuff,1
+            invoke ResetBuff, 1
             inc cPoint
             mov eax, cPoint
             mov edx, 0
@@ -1280,6 +1288,10 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             inc inFinSkill
         .endif
 
+        .if changeBirdCou>0
+            dec changeBirdCou
+        .endif
+
 
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;bird1
 
@@ -1320,7 +1332,7 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
         mov eax, [ebx].OBJECT.x
 
         .if eax < birdX2 && addedFlag2 == 0
-            invoke ResetBuff,2
+            invoke ResetBuff, 2
             inc cPoint2
             
             mov eax, cPoint2
@@ -1341,6 +1353,7 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             inc totPoint2;new
             mov addedFlag2, 1
         .endif
+
 
         mov ebx, offset upTube2
         mov edx, offset downTube2
@@ -1462,6 +1475,10 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             dec inFinSkill2
         .elseif inFinSkill2<0
             inc inFinSkill2
+        .endif
+
+        .if changeBirdCou2>0
+            dec changeBirdCou2
         .endif
         
         
