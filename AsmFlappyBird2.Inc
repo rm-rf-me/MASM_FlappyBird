@@ -58,6 +58,7 @@ MTIMER				equ 25  ;系统时钟
 OBJECT	struct
 	x		dd ?
 	y		dd ?
+	wide	dd ?
 OBJECT ends
 
 .const
@@ -76,12 +77,10 @@ lifeStr				db 'Life: %lu', 0
 speedStr			db 'Speed: %lu', 0
 nowStr 				db 'Now: %lu', 0
 disturbStr 			db 'Skill: %lu', 0
-FinDisturbStr		db 'Press A use final skill!', 0
+FinDisturbStr		db 'Press Q use final skill!', 0
 FinDisturbStr2		db 'Press L use final skill!', 0
+DebugFinSkillStr	db 'FinSkill %lu', 0
 
-alpha_QL            REAL8 0.7
-MapSize             dd 60*30*2*(sizeof REAL8)
-szFile		        db	'fbai.model', 0
 
 winStr db 'You Win!',0ah,0
 lostStr db 'You Lost!',0ah,0
@@ -181,23 +180,6 @@ FinDisturb			dd 0
 FinDisturb2			dd 0
 inFinSkill			dd 0
 inFinSkill2			dd 0
-
-vDistRangeL         dd ?
-vDistRangeR         dd ?
-hDistRangeL         dd ?
-hDistRangeR         dd ?
-
-stateDashV          dd ? 	; range [0, 529], real distance + 174; 53
-stateDashH          dd ? 	; range [0, 180]; 19
-stateV              dd ?
-stateH              dd ?
-
-reward              dd 0
-actionToPerform     dd 0
-
-isAuto              dd 0 ; open auto mode?
-
-QMap                REAL8 60*30*2 dup(<>) ; 53 in V, 18 in H, 2 in action; 0 = do_nothing, 1 = jump
 
 debug               dd 0
 
