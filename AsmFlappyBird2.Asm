@@ -1128,9 +1128,6 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
         .if eax < birdX && addedFlag == 0
             invoke ResetBuff,1
             inc cPoint
-            ;;;;;;add skill
-            push edx
-            push ebx
             mov eax, cPoint
             mov edx, 0
             mov ebx, DisturbMod
@@ -1145,9 +1142,6 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             .if edx == 0
                 mov FinDisturb, 1
             .endif
-            pop ebx
-            pop edx
-            ;;;;;;;
             inc totPoint;new
             mov addedFlag, 1
         .endif
@@ -1162,14 +1156,18 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
         ;     .endif
         ; .endif
 
+        mov ebx, offset upTube
+        mov edx, offset downTube
         .if eax > 16 && eax < 97
-            mov eax, [ebx].OBJECT.y
+            mov eax, [edx].OBJECT.y
             sub eax, birdY
-            .if eax > 135
+            .if eax < 20 || eax > 10000
+                invoke SetupDie2,1 
+            .else
                 mov eax, birdY
-                sub eax, [edx].OBJECT.y
-                add eax, 320
-                .if eax > 135
+                sub eax, [ebx].OBJECT.y
+                sub eax, 320
+                .if eax < 20 || eax > 10000
                     invoke SetupDie2,1 
                 .endif
             .endif
@@ -1243,19 +1241,18 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov ecx, inFinSkill
             mov [ebx].OBJECT.wide, ecx
             mov [edx].OBJECT.wide, ecx
+
             invoke Random, 160
-            add eax, 195
             .if inFinSkill > 0
-                mov ecx, inFinSkill
-                sar ecx, 1
+                add eax, 250
             .else   
-                mov ecx, 0
+                add eax, 195
             .endif
-            add eax, ecx
             mov [edx].OBJECT.y, eax
             sub eax, 450
             sub eax, inFinSkill
             mov [ebx].OBJECT.y, eax
+
             
             mov addedFlag, 0
         .endif
@@ -1325,9 +1322,7 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
         .if eax < birdX2 && addedFlag2 == 0
             invoke ResetBuff,2
             inc cPoint2
-            ;;;;;;add skill
-            push edx
-            push ebx
+            
             mov eax, cPoint2
             mov edx, 0
             mov ebx, DisturbMod
@@ -1342,22 +1337,23 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             .if edx == 0
                 mov FinDisturb2, 1
             .endif
-            pop ebx
-            pop edx
-            ;;;;;;;
+            
             inc totPoint2;new
             mov addedFlag2, 1
         .endif
 
+        mov ebx, offset upTube2
+        mov edx, offset downTube2
         .if eax > 16 && eax < 97
-            mov eax, [ebx].OBJECT.y
-            sub eax, birdY
-            .if eax > 135
-                mov eax, birdY
-                sub eax, [edx].OBJECT.y
-                add eax, 320
-                .if eax > 135
-                    invoke SetupDie2,2
+            mov eax, [edx].OBJECT.y
+            sub eax, birdY2
+            .if eax < 20 || eax > 10000
+                invoke SetupDie2,2
+            .else
+                mov eax, birdY2
+                sub eax, [ebx].OBJECT.y
+                .if eax < 316 || eax > 10000
+                    invoke SetupDie2,2 
                 .endif
             .endif
         .endif
@@ -1427,19 +1423,16 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             add edx, sizeof OBJECT
             mov [ebx].OBJECT.x, eax
             mov [edx].OBJECT.x, eax
-            mov ecx ,inFinSkill2
+            mov ecx, inFinSkill2
             mov [ebx].OBJECT.wide, ecx
             mov [edx].OBJECT.wide, ecx
+
             invoke Random, 160
-            add eax, 195
             .if inFinSkill2 > 0
-                mov ecx, inFinSkill2
-                sar ecx, 1
-            .else 
-                mov ecx, 0
+                add eax, 250
+            .else   
+                add eax, 195
             .endif
-            
-            add eax, ecx
             mov [edx].OBJECT.y, eax
             sub eax, 450
             sub eax, inFinSkill2
@@ -1503,49 +1496,6 @@ ReadModelFile proc
     ret
 
 ReadModelFile endp
-WinMain2 proc
-    LOCAL	wc:WNDCLASSEX
-	LOCAL	msg:MSG
-    invoke  GetModuleHandle,NULL
-	mov     hInstance,eax
-	invoke  GetCommandLine
-	mov	    CommandLine,eax
-	invoke  InitCommonControls
-
-
-	
-    ;窗口属性
-
-	mov		wc.cbSize,sizeof WNDCLASSEX
-	mov		wc.style,CS_HREDRAW or CS_VREDRAW
-	mov		wc.lpfnWndProc,offset WndProc
-	mov		wc.cbClsExtra,NULL
-	mov		wc.cbWndExtra,DLGWINDOWEXTRA
-	push	hInstance
-	pop		wc.hInstance
-	mov		wc.hbrBackground,COLOR_BTNFACE+1
-	mov		wc.lpszMenuName,IDM_MENU
-	mov		wc.lpszClassName,offset ClassName
-	invoke LoadIcon,NULL,IDI_APPLICATION
-	mov		wc.hIcon,eax
-	mov		wc.hIconSm,eax
-	invoke LoadCursor,NULL,IDC_ARROW
-	mov		wc.hCursor,eax
-    
-	invoke RegisterClassEx,addr wc
-	invoke CreateDialogParam,hInstance,IDD_DIALOG,NULL,addr WndProc,NULL
-	invoke ShowWindow,hWnd,SW_SHOWNORMAL
-	invoke UpdateWindow,hWnd
-
-	.while TRUE
-		invoke GetMessage,addr msg,NULL,0,0
-	  .BREAK .if !eax
-		invoke TranslateMessage,addr msg
-		invoke DispatchMessage,addr msg
-	.endw
-	mov		eax,msg.wParam
-	ret
-WinMain2 endp
 
 
 start:
@@ -1555,6 +1505,6 @@ start:
 	mov	    CommandLine,eax
 	invoke  InitCommonControls
 	invoke  WinMain,hInstance,NULL,CommandLine,SW_SHOWDEFAULT
-    ;call WinMain2
+    
 	invoke  ExitProcess,eax
 end start
