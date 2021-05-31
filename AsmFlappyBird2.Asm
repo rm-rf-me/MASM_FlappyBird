@@ -6,13 +6,6 @@ include AsmFlappyBird2.inc
 
 .code
 
-; 1.debuff
-; 2.dec debuff
-; 3.change other player debuff
-; 4.change bird img
-; 5.totpoint 
-
-
 ; 窗口主程序
 WinMain proc hInst:HINSTANCE,hPrevInst:HINSTANCE,CmdLine:LPSTR,CmdShow:DWORD
 	LOCAL	wc:WNDCLASSEX
@@ -137,7 +130,6 @@ WndProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
         invoke SetWindowLong,hBoard2,GWL_WNDPROC,offset BoardProc2
 		mov		OldBoardProc2,eax
 
-		invoke InitParam
 		invoke EndGame
 
         mov isFirst,1
@@ -180,26 +172,48 @@ WndProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
                 mov isFirst,0
             .endif
         ;new
+        .elseif eax==VK_M
+            .if gStatus == 1
+			    .if Disturb2 > 0
+                    dec Disturb2
+                    invoke DeBuff2, 1
+                .endif
+			.endif
 
-		.elseif eax==VK_A
-		    .if isAuto
-		        mov isAuto, 0
-		    .else
-		        mov isAuto, 1
-		    .endif
-		.endif
+        .elseif eax==VK_Z
+            .if gStatus == 1
+			    .if Disturb2 > 0
+                    dec Disturb2
+                    invoke DeBuff2, 2
+                .endif
+			.endif
+
+        .elseif eax==VK_L
+            .if gStatus == 1
+			    .if FinDisturb2 > 0
+                    mov inFinSkill2, 400
+                    ; TODO 
+                    ;mov inFinSkill, -30
+                    mov FinDisturb2, 0
+                .endif
+			.endif
+
+        .elseif eax==VK_Q
+            .if gStatus == 1
+			    .if FinDisturb > 0
+                    mov inFinSkill, 400
+                    ; TODO 
+                    ;mov inFinSkill2, -30
+                    mov FinDisturb, 0
+                .endif
+			.endif
+        .endif
 
 	.elseif eax==WM_COMMAND
 		mov		eax,wParam
 		and		eax,0FFFFh
 		.if eax==IDM_FILE_EXIT
 			invoke SendMessage,hWin,WM_CLOSE,0,0
-		.elseif eax==IDM_MODE
-		    .if isAuto
-		        mov isAuto, 0
-		    .else
-		        mov isAuto, 1
-		    .endif
 		.elseif eax==IDM_SAVE
 		    invoke SaveFile
 		.elseif eax==IDM_OPEN
@@ -335,13 +349,24 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
         
         ; 打印当前分数
 	    mov		wRect.left,0
-	    mov		wRect.top,65
+	    mov		wRect.top,110
 	    mov		wRect.right,288
 	    mov		wRect.bottom,500
 	    invoke SetBkMode,mDC,TRANSPARENT	    
-	    invoke SetTextColor,mDC,0ffffffh
 
+        ; fin skill
+        .if FinDisturb==1
+            invoke SetTextColor,mDC,0ff0000h
+            invoke wsprintfA, addr buffer, offset FinDisturbStr
+            invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER 
+        .endif
+        invoke SetTextColor,mDC,0ffffffh
+        ; skill
+        sub		wRect.top,15
+        invoke wsprintfA, addr buffer, offset disturbStr, Disturb
+        invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER 
         ; life
+        sub		wRect.top,15
         invoke wsprintfA, addr buffer, offset lifeStr, birdLife
         invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER    
         ; now
@@ -360,21 +385,17 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
         sub		wRect.top,15
         invoke wsprintfA,addr buffer,offset speedStr,speed
 	    invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER
+        ; debug
+        sub		wRect.top,15
+        mov ecx, inFinSkill
+        sar ecx, 1
+        invoke wsprintfA,addr buffer,offset DebugFinSkillStr, ecx
+	    invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER
 	    ; invoke SetTextColor,mDC,0000000h
 	    ; mov		wRect.top,49
 	    ; mov		wRect.right,286
 	    ; invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER   
 	    
-        ; RL的 
-	    .if isAuto
-	        mov		wRect.top,30
-	        mov		wRect.right,288
-	        invoke wsprintfA,addr buffer,offset maxFmtStr,maxPoint
-	        invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER
-	        mov		wRect.top,10
-	        invoke wsprintfA,addr buffer,offset lastFmtStr,lPoint
-	        invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER
-	    .endif
 	    
 	.endif
 	
@@ -533,13 +554,24 @@ PaintBoard2 proc uses ebx esi,hWin:HWND,hDC:HDC
         
         ; 打印当前分数
 	    mov		wRect.left,0
-	    mov		wRect.top,65
+	    mov		wRect.top,110
 	    mov		wRect.right,288
 	    mov		wRect.bottom,500
 	    invoke SetBkMode,mDC,TRANSPARENT
-        invoke SetTextColor,mDC,0ffffffh
 
+        ; fin skill
+        .if FinDisturb2==1
+            invoke SetTextColor,mDC,0ff0000h
+            invoke wsprintfA, addr buffer, offset FinDisturbStr2
+            invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER 
+        .endif
+        invoke SetTextColor,mDC,0ffffffh
+        sub		wRect.top,15
+        ; skill
+        invoke wsprintfA, addr buffer, offset disturbStr, Disturb2
+        invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER 
         ; life
+        sub		wRect.top,15
         invoke wsprintfA, addr buffer, offset lifeStr, birdLife2
         invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER    
         ; now
@@ -558,22 +590,19 @@ PaintBoard2 proc uses ebx esi,hWin:HWND,hDC:HDC
         sub		wRect.top,15
         invoke wsprintfA,addr buffer,offset speedStr,speed2
 	    invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER
+        ; debug
+        sub		wRect.top,15
+        mov ecx, inFinSkill2
+        sar ecx, 1
+        invoke wsprintfA,addr buffer,offset DebugFinSkillStr, ecx
+	    invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER
 	    
         ; invoke SetTextColor,mDC,0000000h
 	    ; mov		wRect.top,49
 	    ; mov		wRect.right,286
 	    ; invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER   
 	    
-        ; RL的 
-	    .if isAuto
-	        mov		wRect.top,30
-	        mov		wRect.right,288
-	        invoke wsprintfA,addr buffer,offset maxFmtStr,maxPoint
-	        invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER
-	        mov		wRect.top,10
-	        invoke wsprintfA,addr buffer,offset lastFmtStr,lPoint
-	        invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER
-	    .endif
+
 	    
 	.endif
 	
@@ -720,14 +749,6 @@ Random endp
 SetupFly proc uses eax
     inc rseed
 
-    ; new: 此时鸟放在左边，放在中间由timerproc控制，当游戏未开始时放在中间
-    ; set bird
-    ; mov birdX, 127
-    ; mov birdY, 168
-
-    ; mov birdX2, 127
-    ; mov birdY2, 168
-
     mov birdX, 63
     mov birdY, 200
 
@@ -749,7 +770,9 @@ SetupFly proc uses eax
     mov ebx, offset upTube
     mov edx, offset downTube
     mov [ebx].OBJECT.x, 756 ;第一组
+    mov [ebx].OBJECT.wide, 0
     mov [edx].OBJECT.x, 756
+    mov [edx].OBJECT.wide, 0
     invoke Random, 160
     add eax, 195
     mov [edx].OBJECT.y, eax
@@ -760,7 +783,9 @@ SetupFly proc uses eax
     add ebx, sizeof OBJECT ;第二组
     add edx, sizeof OBJECT
     mov [ebx].OBJECT.x, 956   ;+200
+    mov [ebx].OBJECT.wide, 0
     mov [edx].OBJECT.x, 956
+    mov [edx].OBJECT.wide, 0
     invoke Random, 160
     add eax, 195
     mov [edx].OBJECT.y, eax
@@ -770,7 +795,9 @@ SetupFly proc uses eax
     add ebx, sizeof OBJECT ;第三组
     add edx, sizeof OBJECT
     mov [ebx].OBJECT.x, 1156   ;+200
+    mov [ebx].OBJECT.wide, 0
     mov [edx].OBJECT.x, 1156
+    mov [edx].OBJECT.wide, 0
     invoke Random, 160
     add eax, 195
     mov [edx].OBJECT.y, eax
@@ -780,7 +807,9 @@ SetupFly proc uses eax
     add ebx, sizeof OBJECT ;第四组
     add edx, sizeof OBJECT
     mov [ebx].OBJECT.x, 1356   ;+200
+    mov [ebx].OBJECT.wide, 0
     mov [edx].OBJECT.x, 1356
+    mov [edx].OBJECT.wide, 0
     invoke Random, 160
     add eax, 195
     mov [edx].OBJECT.y, eax
@@ -790,7 +819,9 @@ SetupFly proc uses eax
     mov ebx, offset upTube2
     mov edx, offset downTube2
     mov [ebx].OBJECT.x, 756 ;第一组
+    mov [ebx].OBJECT.wide, 0
     mov [edx].OBJECT.x, 756
+    mov [edx].OBJECT.wide, 0
     invoke Random, 160
     add eax, 195
     mov [edx].OBJECT.y, eax
@@ -801,7 +832,9 @@ SetupFly proc uses eax
     add ebx, sizeof OBJECT ;第二组
     add edx, sizeof OBJECT
     mov [ebx].OBJECT.x, 956   ;+200
+    mov [ebx].OBJECT.wide, 0
     mov [edx].OBJECT.x, 956
+    mov [edx].OBJECT.wide, 0
     invoke Random, 160
     add eax, 195
     mov [edx].OBJECT.y, eax
@@ -811,7 +844,9 @@ SetupFly proc uses eax
     add ebx, sizeof OBJECT ;第三组
     add edx, sizeof OBJECT
     mov [ebx].OBJECT.x, 1156   ;+200
+    mov [ebx].OBJECT.wide, 0
     mov [edx].OBJECT.x, 1156
+    mov [edx].OBJECT.wide, 0
     invoke Random, 160
     add eax, 195
     mov [edx].OBJECT.y, eax
@@ -821,7 +856,9 @@ SetupFly proc uses eax
     add ebx, sizeof OBJECT ;第四组
     add edx, sizeof OBJECT
     mov [ebx].OBJECT.x, 1356   ;+200
+    mov [ebx].OBJECT.wide, 0
     mov [edx].OBJECT.x, 1356
+    mov [edx].OBJECT.wide, 0
     invoke Random, 160
     add eax, 195
     mov [edx].OBJECT.y, eax
@@ -854,9 +891,12 @@ InitParam proc
     mov jumpAc2, -14
     mov cflap, 1
     mov cflapDir, 0
-    mov stateV, 179
-    mov stateH, 0
-    mov isAuto, 0
+    mov Disturb, 0
+    mov Disturb2, 0
+    mov FinDisturb, 0
+    mov FinDisturb2, 0
+    mov inFinSkill, 0
+    mov inFinSkill2, 0
 
     mov indebuf,0
     mov indebuf2,0
@@ -885,112 +925,6 @@ EndGame proc uses edx esi
     ret
 EndGame endp
 
-;游戏结束，回到初始界面，更新得分
-SetupDie proc uses eax
-
-    .if whodie==1
-        .if birdLife > 0
-            ;mov indebuf,1
-            mov eax, cPoint
-            mov cPoint, 0
-            mov lPoint, eax
-            .if eax > maxPoint
-                mov maxPoint, eax  
-            .endif
-            ;add eax, totPoint   ;delete
-            ;mov totPoint, eax   ;delete
-            dec birdLife 
-            mov birdX, 63
-            mov birdY, 200
-
-            push ebx
-            push edx
-            mov ebx, offset upTube
-            mov edx, offset downTube
-            mov [ebx].OBJECT.x, 276 ;第一组
-            mov [edx].OBJECT.x, 276
-            invoke Random, 160
-            add eax, 195
-            mov [edx].OBJECT.y, eax
-            sub eax, 450
-            mov [ebx].OBJECT.y, eax
-
-
-            add ebx, sizeof OBJECT ;第二组
-            add edx, sizeof OBJECT
-            mov [ebx].OBJECT.x, 456   ;+200
-            mov [edx].OBJECT.x, 456
-            invoke Random, 160
-            add eax, 195
-            mov [edx].OBJECT.y, eax
-            sub eax, 450
-            mov [ebx].OBJECT.y, eax
-
-            pop edx
-            pop ebx
-            mov addedFlag, 0
-
-            invoke DeBuff2,1
-        .else
-            invoke EndGame
-        .endif
-    .endif
-
-    .if whodie==2
-        .if birdLife2 > 0
-            ;mov indebuf2,1
-            mov eax, cPoint2
-            mov cPoint2, 0
-            mov lPoint2, eax
-            .if eax > maxPoint2
-                mov maxPoint2, eax  
-            .endif
-            ;add eax, totPoint2  ;delete
-            ;mov totPoint2, eax  ;delete
-            dec birdLife2 
-            mov birdX2, 63
-            mov birdY2, 200
-
-            push ebx
-            push edx
-            mov ebx, offset upTube2
-            mov edx, offset downTube2
-            mov [ebx].OBJECT.x, 276 ;第一组
-            mov [edx].OBJECT.x, 276
-            invoke Random, 160
-            add eax, 195
-            mov [edx].OBJECT.y, eax
-            sub eax, 450
-            mov [ebx].OBJECT.y, eax
-
-
-            add ebx, sizeof OBJECT ;第二组
-            add edx, sizeof OBJECT
-            mov [ebx].OBJECT.x, 456   ;+200
-            mov [edx].OBJECT.x, 456
-            invoke Random, 160
-            add eax, 195
-            mov [edx].OBJECT.y, eax
-            sub eax, 450
-            mov [ebx].OBJECT.y, eax
-
-            pop edx
-            pop ebx
-            mov addedFlag2, 0
-            invoke DeBuff2,2
-        .else
-            invoke EndGame
-        .endif
-    .endif
-
-    .if isAuto
-        mov gStatus, 1
-	    invoke SetupFly
-    .endif
-
- 
-    ret
-SetupDie endp
 
 SetupDie2 proc uses eax,target:dword
 
@@ -1014,7 +948,9 @@ SetupDie2 proc uses eax,target:dword
             mov edx, offset downTube
 
             mov [ebx].OBJECT.x, 456 ;第一组
+            mov [ebx].OBJECT.wide, 0
             mov [edx].OBJECT.x, 456
+            mov [edx].OBJECT.wide, 0
             invoke Random, 160
             add eax, 195
             mov [edx].OBJECT.y, eax
@@ -1025,7 +961,9 @@ SetupDie2 proc uses eax,target:dword
             add ebx, sizeof OBJECT ;第二组
             add edx, sizeof OBJECT
             mov [ebx].OBJECT.x, 656   ;+200
+            mov [ebx].OBJECT.wide, 0
             mov [edx].OBJECT.x, 656
+            mov [edx].OBJECT.wide, 0
             invoke Random, 160
             add eax, 195
             mov [edx].OBJECT.y, eax
@@ -1035,7 +973,9 @@ SetupDie2 proc uses eax,target:dword
             add ebx, sizeof OBJECT ;第三组
             add edx, sizeof OBJECT
             mov [ebx].OBJECT.x, 856   ;+200
+            mov [ebx].OBJECT.wide, 0
             mov [edx].OBJECT.x, 856
+            mov [edx].OBJECT.wide, 0
             invoke Random, 160
             add eax, 195
             mov [edx].OBJECT.y, eax
@@ -1045,7 +985,9 @@ SetupDie2 proc uses eax,target:dword
             add ebx, sizeof OBJECT ;第四组
             add edx, sizeof OBJECT
             mov [ebx].OBJECT.x, 1056   ;+200
+            mov [ebx].OBJECT.wide, 0
             mov [edx].OBJECT.x, 1056
+            mov [edx].OBJECT.wide, 0
             invoke Random, 160
             add eax, 195
             mov [edx].OBJECT.y, eax
@@ -1055,7 +997,8 @@ SetupDie2 proc uses eax,target:dword
             pop edx
             pop ebx
             mov addedFlag, 0
-
+            mov FinDisturb, 0
+            mov inFinSkill, 0
             invoke DeBuff2,1
         .else
             invoke EndGame
@@ -1082,7 +1025,9 @@ SetupDie2 proc uses eax,target:dword
             mov edx, offset downTube2
             
             mov [ebx].OBJECT.x, 456 ;第一组
+            mov [ebx].OBJECT.wide, 0
             mov [edx].OBJECT.x, 456
+            mov [edx].OBJECT.wide, 0
             invoke Random, 160
             add eax, 195
             mov [edx].OBJECT.y, eax
@@ -1093,7 +1038,9 @@ SetupDie2 proc uses eax,target:dword
             add ebx, sizeof OBJECT ;第二组
             add edx, sizeof OBJECT
             mov [ebx].OBJECT.x, 656   ;+200
+            mov [ebx].OBJECT.wide, 0
             mov [edx].OBJECT.x, 656
+            mov [edx].OBJECT.wide, 0
             invoke Random, 160
             add eax, 195
             mov [edx].OBJECT.y, eax
@@ -1103,7 +1050,9 @@ SetupDie2 proc uses eax,target:dword
             add ebx, sizeof OBJECT ;第三组
             add edx, sizeof OBJECT
             mov [ebx].OBJECT.x, 856   ;+200
+            mov [ebx].OBJECT.wide, 0
             mov [edx].OBJECT.x, 856
+            mov [edx].OBJECT.wide, 0
             invoke Random, 160
             add eax, 195
             mov [edx].OBJECT.y, eax
@@ -1113,7 +1062,9 @@ SetupDie2 proc uses eax,target:dword
             add ebx, sizeof OBJECT ;第四组
             add edx, sizeof OBJECT
             mov [ebx].OBJECT.x, 1056   ;+200
+            mov [ebx].OBJECT.wide, 0
             mov [edx].OBJECT.x, 1056
+            mov [edx].OBJECT.wide, 0
             invoke Random, 160
             add eax, 195
             mov [edx].OBJECT.y, eax
@@ -1124,203 +1075,23 @@ SetupDie2 proc uses eax,target:dword
             pop ebx
             mov addedFlag2, 0
             invoke DeBuff2,2
+            mov FinDisturb2, 0
+            mov inFinSkill2, 0
         .else
             invoke EndGame
         .endif
     .endif
 
-    .if isAuto
-        mov gStatus, 1
-	    invoke SetupFly
-    .endif
+
 
  
     ret
 SetupDie2 endp
 
 
-SetDist proc uses eax ebx
-    
-    mov ebx, offset downTube
-    mov eax, [ebx].OBJECT.x
-    add eax, 52
-    .if eax < (birdX) || eax > 10000 ; behind the bird, use the second tube
-        add ebx, sizeof OBJECT
-    .endif
-    mov eax, [ebx].OBJECT.x
-    sub eax, birdX
-    ;sub eax, 34
-    .if eax > 179
-        mov eax, 179
-    .endif
-    mov stateDashH, eax
-    mov eax, [ebx].OBJECT.y
-    mov ebx, birdY
-    add ebx, 24
-    sub eax, ebx
-    add eax, 200
-    mov stateDashV, eax 
-    ret
-
-SetDist endp
-
-;new
-SetDist2 proc uses eax ebx
-    
-    mov ebx, offset downTube
-    mov eax, [ebx].OBJECT.x
-    add eax, 52
-    .if eax < (birdX2) || eax > 10000 ; behind the bird, use the second tube
-        add ebx, sizeof OBJECT
-    .endif
-    mov eax, [ebx].OBJECT.x
-    sub eax, birdX2
-    ;sub eax, 34
-    .if eax > 179
-        mov eax, 179
-    .endif
-    mov stateDashH, eax
-    mov eax, [ebx].OBJECT.y
-    mov ebx, birdY2
-    add ebx, 24
-    sub eax, ebx
-    add eax, 200
-    mov stateDashV, eax 
-    ret
-
-SetDist2 endp
-
-
-UpdateQ proc uses eax ebx edx
-    LOCAL V_s_dash_a_dash:REAL8
-    LOCAL Q_s_a:REAL8
-    LOCAL tempX:DWORD
-    LOCAL tempY:DWORD
-    
-    finit
-    
-    mov edx, 0
-    mov eax, stateDashV
-    mov ebx, 10
-    div ebx
-    mov tempX, eax
-    mov edx, 0
-    mov eax, stateDashH
-    mov ebx, 10
-    div ebx
-    mov tempY, eax
-    mov eax, tempX
-    mov ebx, 50
-    mul ebx
-    mov ebx, eax
-    add ebx, tempY
-    add ebx, tempY
-    fld QMap[ebx * type QMap] ; load Q[tempX][tempY][0]
-    inc ebx
-    fcom QMap[ebx * type QMap] ; compare with Q[tempX][tempY][1]
-    fnstsw ax
-    sahf
-    ja L1
-    fstp V_s_dash_a_dash
-    fld QMap[ebx * type QMap]
-    L1:
-    fstp V_s_dash_a_dash ; save the bigger number to V_s_dash_a_dash
-    
-    finit
-    
-    mov edx, 0
-    mov eax, stateV
-    mov ebx, 10
-    div ebx
-    mov tempX, eax
-    mov edx, 0
-    mov eax, stateH
-    mov ebx, 10
-    div ebx
-    mov tempY, eax
-    mov eax, tempX
-    mov ebx, 50
-    mul ebx
-    add eax, tempY
-    add eax, tempY
-    add eax, actionToPerform
-    mov ebx, eax
-    fld QMap[ebx * type QMap]
-    fstp Q_s_a ; get Q_s_a
-    
-    fld V_s_dash_a_dash
-    fsub Q_s_a
-    
-    fild reward
-    fadd
-    
-    fld alpha_QL
-    fmul
-    
-    fld Q_s_a
-    fadd
-    
-    fstp QMap[ebx * type QMap]
-    
-    mov eax, stateDashV
-    mov stateV, eax
-    
-    mov eax, stateDashH
-    mov stateH, eax
-
-    ret
-
-UpdateQ endp
-
-
-PerformAction proc uses eax ebx
-    LOCAL tempX:DWORD
-    LOCAL tempY:DWORD
-    
-    finit
-    
-    mov edx, 0
-    mov eax, stateV
-    mov ebx, 10
-    div ebx
-    mov tempX, eax
-    mov edx, 0
-    mov eax, stateH
-    mov ebx, 10
-    div ebx
-    mov tempY, eax
-    mov eax, tempX
-    mov ebx, 50
-    mul ebx
-    add eax, tempY
-    add eax, tempY
-    mov ebx, eax
-    
-    fld QMap[ebx * type QMap] ; load Q[tempX][tempY][0]
-    inc ebx
-    fcom QMap[ebx * type QMap] ; compare with Q[tempX][tempY][1]
-    fnstsw ax
-    sahf
-    jb L3
-    mov actionToPerform, 0 ; do nothing
-    jmp L4
-    L3:
-    mov actionToPerform, 1
-    mov eax, jumpAc
-	mov birdAc, eax
-    L4:
-
-    ret
-
-PerformAction endp
-
-
 TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 
     .if gStatus == 1
-        .if isAuto
-            invoke PerformAction
-        .endif
 
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;bird1
         mov whodie, 1
@@ -1328,7 +1099,6 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
         mov eax, birdAc
         add eax, gravityAc   ;鸟的速度+重力,每个loop重力都在不断累积
 
-        mov reward, 1
         .if eax > birdMaxAc && eax < 10000   ;此处由于无符号数相减比较，内存中为反码形式，只要限定一个较大的数即可
             mov eax, birdMaxAc ;11为鸟下落的最大速度
         .endif
@@ -1343,7 +1113,6 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 
 
         .if eax > birdBottom ; touch the ground, failed
-            mov reward, -1000
             invoke SetupDie2,1
 
         .else
@@ -1358,20 +1127,50 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 
         .if eax < birdX && addedFlag == 0
             invoke ResetBuff,1
-            mov reward, 2
             inc cPoint
+            mov eax, cPoint
+            mov edx, 0
+            mov ebx, DisturbMod
+            div ebx
+            .if edx == 0
+                inc Disturb
+            .endif
+            mov eax, cPoint
+            mov edx, 0
+            mov ebx, FinDisturbMod
+            div ebx
+            .if edx == 0
+                mov FinDisturb, 1
+            .endif
             inc totPoint;new
             mov addedFlag, 1
         .endif
 
-        .if eax > 16 && eax < 97
-            mov eax, [ebx].OBJECT.y
-            sub eax, birdY
-            .if eax < 20 || eax > 135   ;撞柱子
-                mov reward, -1000
-                invoke SetupDie2,1 ;触发死亡事件
-            .endif
+        ; .if eax > 16 && eax < 97
+        ;     mov eax, [ebx].OBJECT.y
+        ;     sub eax, birdY
+        ;     mov ecx, [ebx].OBJECT.wide
+        ;     ;add ecx, 135
+        ;     .if eax < 20 || ecx > ecx   ;撞柱子
+        ;         invoke SetupDie2,1 ;触发死亡事件
+        ;     .endif
+        ; .endif
 
+        mov ebx, offset upTube
+        mov edx, offset downTube
+        .if eax > 16 && eax < 97
+            mov eax, [edx].OBJECT.y
+            sub eax, birdY
+            .if eax < 20 || eax > 10000
+                invoke SetupDie2,1 
+            .else
+                mov eax, birdY
+                sub eax, [ebx].OBJECT.y
+                sub eax, 320
+                .if eax < 20 || eax > 10000
+                    invoke SetupDie2,1 
+                .endif
+            .endif
         .endif
         
         mov ebx, offset upTube
@@ -1384,6 +1183,8 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [ebx].OBJECT.x, ecx    ;2号柱子转移到1号柱子
             mov ecx, [eax].OBJECT.y
             mov [ebx].OBJECT.y, ecx
+            mov ecx, [eax].OBJECT.wide
+            mov [ebx].OBJECT.wide, ecx
 
             mov ebx, eax
             add eax, sizeof OBJECT
@@ -1391,6 +1192,8 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [ebx].OBJECT.x, ecx    ;3号柱子转移到2号柱子
             mov ecx, [eax].OBJECT.y
             mov [ebx].OBJECT.y, ecx
+            mov ecx, [eax].OBJECT.wide
+            mov [ebx].OBJECT.wide, ecx
 
             mov ebx, eax
             add eax, sizeof OBJECT
@@ -1398,6 +1201,8 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [ebx].OBJECT.x, ecx    ;4号柱子转移到3号柱子
             mov ecx, [eax].OBJECT.y
             mov [ebx].OBJECT.y, ecx
+            mov ecx, [eax].OBJECT.wide
+            mov [ebx].OBJECT.wide, ecx
 
             mov eax, edx
             add eax, sizeof OBJECT
@@ -1405,6 +1210,8 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [edx].OBJECT.x, ecx
             mov ecx, [eax].OBJECT.y
             mov [edx].OBJECT.y, ecx
+            mov ecx, [eax].OBJECT.wide
+            mov [edx].OBJECT.wide, ecx
 
             mov edx, eax
             add eax, sizeof OBJECT
@@ -1412,6 +1219,8 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [edx].OBJECT.x, ecx
             mov ecx, [eax].OBJECT.y
             mov [edx].OBJECT.y, ecx
+            mov ecx, [eax].OBJECT.wide
+            mov [edx].OBJECT.wide, ecx
 
             mov edx, eax
             add eax, sizeof OBJECT
@@ -1419,6 +1228,8 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [edx].OBJECT.x, ecx
             mov ecx, [eax].OBJECT.y
             mov [edx].OBJECT.y, ecx
+            mov ecx, [eax].OBJECT.wide
+            mov [edx].OBJECT.wide, ecx
 
             
             mov eax, [edx].OBJECT.x
@@ -1427,11 +1238,21 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             add edx, sizeof OBJECT
             mov [ebx].OBJECT.x, eax
             mov [edx].OBJECT.x, eax
+            mov ecx, inFinSkill
+            mov [ebx].OBJECT.wide, ecx
+            mov [edx].OBJECT.wide, ecx
+
             invoke Random, 160
-            add eax, 195
+            .if inFinSkill > 0
+                add eax, 250
+            .else   
+                add eax, 195
+            .endif
             mov [edx].OBJECT.y, eax
             sub eax, 450
+            sub eax, inFinSkill
             mov [ebx].OBJECT.y, eax
+
             
             mov addedFlag, 0
         .endif
@@ -1453,10 +1274,10 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
         pop edx
         pop ebx
         
-        .if isAuto
-            invoke SetDist
-            invoke SetDist2 ;new
-            invoke UpdateQ    
+        .if inFinSkill>0
+            dec inFinSkill
+        .elseif inFinSkill<0
+            inc inFinSkill
         .endif
 
 
@@ -1471,7 +1292,6 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
         mov eax, birdAc2
         add eax, gravityAc2   ;鸟的速度+重力,每个loop重力都在不断累积
 
-        mov reward, 1
         .if eax > birdMaxAc && eax < 10000   ;此处由于无符号数相减比较，内存中为反码形式，只要限定一个较大的数即可
             mov eax, birdMaxAc ;11为鸟下落的最大速度
         .endif
@@ -1486,7 +1306,6 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 
 
         .if eax > birdBottom ; touch the ground, failed
-            mov reward, -1000
             invoke SetupDie2,2
 
         .else
@@ -1502,18 +1321,40 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 
         .if eax < birdX2 && addedFlag2 == 0
             invoke ResetBuff,2
-            mov reward, 2
             inc cPoint2
+            
+            mov eax, cPoint2
+            mov edx, 0
+            mov ebx, DisturbMod
+            div ebx
+            .if edx == 0
+                inc Disturb2
+            .endif
+            mov eax, cPoint2
+            mov edx, 0
+            mov ebx, FinDisturbMod
+            div ebx
+            .if edx == 0
+                mov FinDisturb2, 1
+            .endif
+            
             inc totPoint2;new
             mov addedFlag2, 1
         .endif
 
+        mov ebx, offset upTube2
+        mov edx, offset downTube2
         .if eax > 16 && eax < 97
-            mov eax, [ebx].OBJECT.y
+            mov eax, [edx].OBJECT.y
             sub eax, birdY2
-            .if eax < 20 || eax > 135   ;撞柱子
-                mov reward, -1000
+            .if eax < 20 || eax > 10000
                 invoke SetupDie2,2
+            .else
+                mov eax, birdY2
+                sub eax, [ebx].OBJECT.y
+                .if eax < 316 || eax > 10000
+                    invoke SetupDie2,2 
+                .endif
             .endif
         .endif
         
@@ -1527,6 +1368,8 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [ebx].OBJECT.x, ecx    ;2号柱子转移到1号柱子
             mov ecx, [eax].OBJECT.y
             mov [ebx].OBJECT.y, ecx
+            mov ecx, [eax].OBJECT.wide
+            mov [ebx].OBJECT.wide, ecx
 
             mov ebx, eax
             add eax, sizeof OBJECT
@@ -1534,6 +1377,8 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [ebx].OBJECT.x, ecx    ;3号柱子转移到2号柱子
             mov ecx, [eax].OBJECT.y
             mov [ebx].OBJECT.y, ecx
+            mov ecx, [eax].OBJECT.wide
+            mov [ebx].OBJECT.wide, ecx
 
             mov ebx, eax
             add eax, sizeof OBJECT
@@ -1541,6 +1386,8 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [ebx].OBJECT.x, ecx    ;4号柱子转移到3号柱子
             mov ecx, [eax].OBJECT.y
             mov [ebx].OBJECT.y, ecx
+            mov ecx, [eax].OBJECT.wide
+            mov [ebx].OBJECT.wide, ecx
 
             mov eax, edx
             add eax, sizeof OBJECT
@@ -1548,6 +1395,8 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [edx].OBJECT.x, ecx
             mov ecx, [eax].OBJECT.y
             mov [edx].OBJECT.y, ecx
+            mov ecx, [eax].OBJECT.wide
+            mov [edx].OBJECT.wide, ecx
 
             mov edx, eax
             add eax, sizeof OBJECT
@@ -1555,6 +1404,8 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [edx].OBJECT.x, ecx
             mov ecx, [eax].OBJECT.y
             mov [edx].OBJECT.y, ecx
+            mov ecx, [eax].OBJECT.wide
+            mov [edx].OBJECT.wide, ecx
 
             mov edx, eax
             add eax, sizeof OBJECT
@@ -1562,6 +1413,8 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             mov [edx].OBJECT.x, ecx
             mov ecx, [eax].OBJECT.y
             mov [edx].OBJECT.y, ecx
+            mov ecx, [eax].OBJECT.wide
+            mov [edx].OBJECT.wide, ecx
 
             
             mov eax, [edx].OBJECT.x
@@ -1570,10 +1423,19 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             add edx, sizeof OBJECT
             mov [ebx].OBJECT.x, eax
             mov [edx].OBJECT.x, eax
+            mov ecx, inFinSkill2
+            mov [ebx].OBJECT.wide, ecx
+            mov [edx].OBJECT.wide, ecx
+
             invoke Random, 160
-            add eax, 195
+            .if inFinSkill2 > 0
+                add eax, 250
+            .else   
+                add eax, 195
+            .endif
             mov [edx].OBJECT.y, eax
             sub eax, 450
+            sub eax, inFinSkill2
             mov [ebx].OBJECT.y, eax
             
             mov addedFlag2, 0
@@ -1595,12 +1457,13 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
         .endw
         pop edx
         pop ebx
-        
-        .if isAuto
-            invoke SetDist
-            invoke SetDist2 ;new
-            invoke UpdateQ    
+
+        .if inFinSkill2>0
+            dec inFinSkill2
+        .elseif inFinSkill2<0
+            inc inFinSkill2
         .endif
+        
         
     ; new: 游戏未开始时鸟放在中间
     .else
@@ -1622,10 +1485,6 @@ TimerProc endp
 SaveFile proc uses eax ebx
     LOCAL writtenByte:DWORD
     
-	invoke CreateFile,offset szFile,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,0
-	mov ebx, eax
-	invoke WriteFile, ebx, offset QMap, MapSize, addr writtenByte, 0
-	invoke CloseHandle, ebx
     ret
 
 SaveFile endp
@@ -1634,60 +1493,9 @@ SaveFile endp
 ReadModelFile proc
     LOCAL readByte
 
-    invoke CreateFile,offset szFile,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,0
-    .if eax
-	    mov ebx, eax
-	    invoke ReadFile, ebx, offset QMap, MapSize, addr readByte, 0
-	.endif
-	invoke CloseHandle, ebx
     ret
 
 ReadModelFile endp
-
-
-WinMain2 proc
-    LOCAL	wc:WNDCLASSEX
-	LOCAL	msg:MSG
-    invoke  GetModuleHandle,NULL
-	mov     hInstance,eax
-	invoke  GetCommandLine
-	mov	    CommandLine,eax
-	invoke  InitCommonControls
-
-
-	
-    ;窗口属性
-
-	mov		wc.cbSize,sizeof WNDCLASSEX
-	mov		wc.style,CS_HREDRAW or CS_VREDRAW
-	mov		wc.lpfnWndProc,offset WndProc
-	mov		wc.cbClsExtra,NULL
-	mov		wc.cbWndExtra,DLGWINDOWEXTRA
-	push	hInstance
-	pop		wc.hInstance
-	mov		wc.hbrBackground,COLOR_BTNFACE+1
-	mov		wc.lpszMenuName,IDM_MENU
-	mov		wc.lpszClassName,offset ClassName
-	invoke LoadIcon,NULL,IDI_APPLICATION
-	mov		wc.hIcon,eax
-	mov		wc.hIconSm,eax
-	invoke LoadCursor,NULL,IDC_ARROW
-	mov		wc.hCursor,eax
-    
-	invoke RegisterClassEx,addr wc
-	invoke CreateDialogParam,hInstance,IDD_DIALOG,NULL,addr WndProc,NULL
-	invoke ShowWindow,hWnd,SW_SHOWNORMAL
-	invoke UpdateWindow,hWnd
-
-	.while TRUE
-		invoke GetMessage,addr msg,NULL,0,0
-	  .BREAK .if !eax
-		invoke TranslateMessage,addr msg
-		invoke DispatchMessage,addr msg
-	.endw
-	mov		eax,msg.wParam
-	ret
-WinMain2 endp
 
 
 start:
@@ -1697,10 +1505,6 @@ start:
 	mov	    CommandLine,eax
 	invoke  InitCommonControls
 	invoke  WinMain,hInstance,NULL,CommandLine,SW_SHOWDEFAULT
-    ;call WinMain2
+    
 	invoke  ExitProcess,eax
 end start
-
-
-
-

@@ -50,11 +50,15 @@ IDM_OPEN            equ 10002
 IDM_SAVE            equ 10003
 IDM_MODE            equ 10004
 
+DisturbMod			equ 3
+FinDisturbMod		equ 1
+
 MTIMER				equ 25  ;系统时钟
 
 OBJECT	struct
 	x		dd ?
 	y		dd ?
+	wide	dd ?
 OBJECT ends
 
 .const
@@ -72,16 +76,18 @@ totFmtStr			db 'Tot: %lu', 0
 lifeStr				db 'Life: %lu', 0
 speedStr			db 'Speed: %lu', 0
 nowStr 				db 'Now: %lu', 0
-alpha_QL            REAL8 0.7
-MapSize             dd 60*30*2*(sizeof REAL8)
-szFile		        db	'fbai.model', 0
+disturbStr 			db 'Skill: %lu', 0
+FinDisturbStr		db 'Press Q use final skill!', 0
+FinDisturbStr2		db 'Press L use final skill!', 0
+DebugFinSkillStr	db 'FinSkill %lu', 0
+
 
 winStr db 'You Win!',0ah,0
 lostStr db 'You Lost!',0ah,0
 
 .data?
 
-couthelp byte '请输入两�?整数�?',0ah,0
+couthelp byte '请输入两�?整数�?',0ah,0
 hInstance			dd ?
 CommandLine			dd ?
 hWnd				dd ?
@@ -137,13 +143,13 @@ bottomX2             dd 0
 ; birdY = min(max(birdAC + birdAC, 0), birdBottom)
 ; If hit the buttom, birdAc = jumpAc
 
-; 鸟位�?信息
+; 鸟位�?信息
 birdX               dd ?
 birdY               dd ?
 birdX2              dd ?	; new
 birdY2              dd ?	 
 
-; 鸟生命�?
+; 鸟生命�?
 birdLife			sdword ?
 birdLife2			sdword ?
 prebirdLife			sdword ?
@@ -162,28 +168,18 @@ gravityAc2           dd 2
 jumpAc              dd -14
 jumpAc2              dd -14
 
-cflap               dd 1	; 鸟切�?
+cflap               dd 1	; 鸟切换
 cflapDir            dd 0
 
 addedFlag           dd 0	; 柱子更新
 addedFlag2          dd 0	; 柱子更新
 
-vDistRangeL         dd ?
-vDistRangeR         dd ?
-hDistRangeL         dd ?
-hDistRangeR         dd ?
-
-stateDashV          dd ? 	; range [0, 529], real distance + 174; 53
-stateDashH          dd ? 	; range [0, 180]; 19
-stateV              dd ?
-stateH              dd ?
-
-reward              dd 0
-actionToPerform     dd 0
-
-isAuto              dd 0 ; open auto mode?
-
-QMap                REAL8 60*30*2 dup(<>) ; 53 in V, 18 in H, 2 in action; 0 = do_nothing, 1 = jump
+Disturb				dd 0	; bird的主动技能
+Disturb2			dd 0
+FinDisturb			dd 0
+FinDisturb2			dd 0
+inFinSkill			dd 0
+inFinSkill2			dd 0
 
 debug               dd 0
 
