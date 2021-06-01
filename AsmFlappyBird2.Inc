@@ -38,6 +38,7 @@ IDB_BIRD			equ 102
 IDB_BIRD2			equ 104
 IDB_BIRD3			equ 105
 IDB_BIRD4		    equ 106
+IDB_BIRD_SKILL		equ 107
 IDB_BAR             equ 103
 
 IDD_DIALOG			equ 1000
@@ -102,6 +103,7 @@ birdIml             dd ?
 birdIml2            dd ?
 birdIml3            dd ?
 birdIml4            dd ?
+birdSkill  			dd ?
 tubeIml             dd ?
 barIml              dd ?
 

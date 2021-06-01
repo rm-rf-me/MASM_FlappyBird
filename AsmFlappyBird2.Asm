@@ -109,6 +109,14 @@ WndProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 		invoke ImageList_AddMasked,birdIml4,hBmp,0
 		invoke DeleteObject,hBmp
 
+        ; Load bird_skill image
+		invoke ImageList_Create,34,24,ILC_COLOR16 or ILC_MASK,3,3
+		mov		birdSkill,eax
+		invoke LoadBitmap,hInstance,IDB_BIRD_SKILL
+		mov		hBmp,eax
+		invoke ImageList_AddMasked,birdSkill,hBmp,0
+		invoke DeleteObject,hBmp
+
 		; Load bar image
 		invoke ImageList_Create,676,112,ILC_COLOR16,1,0
 		mov		barIml,eax
@@ -420,7 +428,9 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
 
     .if indebuf ==1
         invoke ImageList_Draw, birdIml3, cflap, mDC, birdX, birdY, ILD_TRANSPARENT;new
-    .elseif indebuf ==0
+    .elseif inFinSkill
+        invoke ImageList_Draw, birdSkill, cflap, mDC, birdX, birdY, ILD_TRANSPARENT;new
+    .else
         invoke ImageList_Draw, birdIml, cflap, mDC, birdX, birdY, ILD_TRANSPARENT;new
     .endif
 	
@@ -629,7 +639,9 @@ PaintBoard2 proc uses ebx esi,hWin:HWND,hDC:HDC
 
     .if indebuf2 ==1
         invoke ImageList_Draw, birdIml4, cflap, mDC, birdX2, birdY2, ILD_TRANSPARENT;new
-    .elseif indebuf2==0
+    .elseif inFinSkill2
+        invoke ImageList_Draw, birdSkill, cflap, mDC, birdX2, birdY2, ILD_TRANSPARENT;new
+    .else
         invoke ImageList_Draw, birdIml2, cflap, mDC, birdX2, birdY2, ILD_TRANSPARENT;new
     .endif
 	
