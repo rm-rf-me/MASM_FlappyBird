@@ -1,6 +1,6 @@
 @echo off
-set include=D:\masm32\include
-set lib=D:\masm32\lib
+set include=E:\masm32\include
+set lib=E:\masm32\lib
 ml /c /coff AsmFlappyBird2.Asm
 rc AsmFlappyBird.Rc
 link /subsystem:windows AsmFlappyBird2.obj AsmFlappyBird.RES
