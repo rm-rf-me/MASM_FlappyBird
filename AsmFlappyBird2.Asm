@@ -349,9 +349,9 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
         
         ; 打印当前分数
 	    mov		wRect.left,0
-	    mov		wRect.top,110
+	    mov		wRect.top,125
 	    mov		wRect.right,288
-	    mov		wRect.bottom,500
+	    mov		wRect.bottom,515
 	    invoke SetBkMode,mDC,TRANSPARENT	    
 
         ; fin skill
@@ -360,6 +360,16 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
             invoke wsprintfA, addr buffer, offset FinDisturbStr
             invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER 
         .endif
+
+
+        ; skill
+        sub		wRect.top,15
+        .if Disturb > 0
+            invoke SetTextColor,mDC,000ff00h
+            invoke wsprintfA, addr buffer, offset DisturTip
+            invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER 
+        .endif
+
         invoke SetTextColor,mDC,0ffffffh
         ; skill
         sub		wRect.top,15
@@ -554,9 +564,9 @@ PaintBoard2 proc uses ebx esi,hWin:HWND,hDC:HDC
         
         ; 打印当前分数
 	    mov		wRect.left,0
-	    mov		wRect.top,110
+	    mov		wRect.top,125
 	    mov		wRect.right,288
-	    mov		wRect.bottom,500
+	    mov		wRect.bottom,515
 	    invoke SetBkMode,mDC,TRANSPARENT
 
         ; fin skill
@@ -565,6 +575,16 @@ PaintBoard2 proc uses ebx esi,hWin:HWND,hDC:HDC
             invoke wsprintfA, addr buffer, offset FinDisturbStr2
             invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER 
         .endif
+
+        ;prime skill
+        sub		wRect.top,15
+        ; skill
+        .if Disturb2>0
+            invoke SetTextColor,mDC,000ff00h
+            invoke wsprintfA, addr buffer, offset DisturTip2
+            invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER 
+        .endif
+
         invoke SetTextColor,mDC,0ffffffh
         sub		wRect.top,15
         ; skill
@@ -877,8 +897,8 @@ InitParam proc
     mov NormSpeed, 4
     mov NormAravityAc, 2
     mov NormJumpAc, -14
-    mov birdLife, 100
-    mov birdLife2, 100
+    mov birdLife, 300
+    mov birdLife2, 300
     mov speed, 4
     mov speed2, 4
     mov bottomY, 387

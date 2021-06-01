@@ -77,6 +77,8 @@ lifeStr				db 'Life: %lu', 0
 speedStr			db 'Speed: %lu', 0
 nowStr 				db 'Now: %lu', 0
 disturbStr 			db 'Skill: %lu', 0
+DisturTip			db 'Press Z use prime skill',0
+DisturTip2			db 'Press M use prime skill',0
 FinDisturbStr		db 'Press Q use final skill!', 0
 FinDisturbStr2		db 'Press L use final skill!', 0
 DebugFinSkillStr	db 'FinSkill %lu', 0
