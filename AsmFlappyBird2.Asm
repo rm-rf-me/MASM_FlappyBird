@@ -190,8 +190,8 @@ WndProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 
         .elseif eax==VK_Z
             .if gStatus == 1
-			    .if Disturb2 > 0
-                    dec Disturb2
+			    .if Disturb > 0
+                    dec Disturb
                     invoke DeBuff2, 2
                 .endif
 			.endif
@@ -720,14 +720,14 @@ DeBuff2 proc target:dword
         mov indebuf,1  ;debuf标记置位
         mov speed, 5   ;加速
         mov gravityAc, 2 ;增加重力
-        mov jumpAc, -13  ;减少跳跃力度
+        mov jumpAc, -12  ;减少跳跃力度
     .endif
 
     .if target==2 
         mov indebuf2,1
         mov speed2, 5
         mov gravityAc2, 2 ;增加重力
-        mov jumpAc2, -13  ;减少跳跃力度
+        mov jumpAc2, -12  ;减少跳跃力度
     .endif
     ret
 DeBuff2 endp
@@ -1198,8 +1198,7 @@ TimerProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
             .else
                 mov eax, birdY
                 sub eax, [ebx].OBJECT.y
-                sub eax, 320
-                .if eax < 20 || eax > 10000
+                .if eax < 316 || eax > 10000
                     invoke SetupDie2,1 
                 .endif
             .endif
