@@ -51,8 +51,8 @@ IDM_OPEN            equ 10002
 IDM_SAVE            equ 10003
 IDM_MODE            equ 10004
 
-DisturbMod			equ 3
-FinDisturbMod		equ 1
+DisturbMod			equ 2
+FinDisturbMod		equ 5
 
 MTIMER				equ 25  ;系统时钟
 

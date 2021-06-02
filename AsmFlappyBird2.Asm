@@ -910,7 +910,7 @@ InitParam proc
     mov NormAravityAc, 2
     mov NormJumpAc, -14
     mov birdLife, 5
-    mov birdLife2, 300
+    mov birdLife2, 5
     mov speed, 4
     mov speed2, 4
     mov bottomY, 387
@@ -1035,7 +1035,7 @@ SetupDie2 proc uses eax,target:dword
             mov addedFlag, 0
             mov FinDisturb, 0
             mov inFinSkill, 0
-            invoke DeBuff2,1
+            ; invoke DeBuff2,1
         .else
             invoke EndGame
         .endif
@@ -1110,7 +1110,7 @@ SetupDie2 proc uses eax,target:dword
             pop edx
             pop ebx
             mov addedFlag2, 0
-            invoke DeBuff2,2
+            ; invoke DeBuff2,2
             mov FinDisturb2, 0
             mov inFinSkill2, 0
         .else
