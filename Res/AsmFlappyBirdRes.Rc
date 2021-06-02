@@ -5,6 +5,7 @@
 #define IDB_BIRD2			        104
 #define IDB_BIRD3			        105
 #define IDB_BIRD4			        106
+#define IDB_BIRD_SKILL			    107
 
 IDB_BG				BITMAP   DISCARDABLE "Res/background.bmp"
 IDB_TUBE			BITMAP   DISCARDABLE "Res/column.bmp"
@@ -12,4 +13,5 @@ IDB_BIRD			BITMAP   DISCARDABLE "Res/bird.bmp"
 IDB_BIRD2			BITMAP   DISCARDABLE "Res/bird2.bmp"
 IDB_BIRD3			BITMAP   DISCARDABLE "Res/bird3.bmp"
 IDB_BIRD4		    BITMAP   DISCARDABLE "Res/bird4.bmp"
+IDB_BIRD_SKILL      BITMAP   DISCARDABLE "Res/skill.bmp"
 IDB_BAR				BITMAP   DISCARDABLE "Res/greenBar.bmp"

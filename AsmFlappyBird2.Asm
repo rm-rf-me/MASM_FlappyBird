@@ -101,12 +101,20 @@ WndProc proc hWin:HWND,uMsg:UINT,wParam:WPARAM,lParam:LPARAM
 		invoke ImageList_AddMasked,birdIml3,hBmp,0
 		invoke DeleteObject,hBmp
 
-         ; Load bird_de2 image
+        ; Load bird_de2 image
 		invoke ImageList_Create,34,24,ILC_COLOR16 or ILC_MASK,3,3
 		mov		birdIml4,eax
 		invoke LoadBitmap,hInstance,IDB_BIRD4
 		mov		hBmp,eax
 		invoke ImageList_AddMasked,birdIml4,hBmp,0
+		invoke DeleteObject,hBmp
+
+        ; Load bird_skill image
+		invoke ImageList_Create,34,24,ILC_COLOR16 or ILC_MASK,3,3
+		mov		birdSkill,eax
+		invoke LoadBitmap,hInstance,IDB_BIRD_SKILL
+		mov		hBmp,eax
+		invoke ImageList_AddMasked,birdSkill,hBmp,0
 		invoke DeleteObject,hBmp
 
 		; Load bar image
@@ -430,7 +438,9 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
 
     .if indebuf ==1
         invoke ImageList_Draw, birdIml3, cflap, mDC, birdX, birdY, ILD_TRANSPARENT;new
-    .elseif indebuf ==0
+    .elseif inFinSkill
+        invoke ImageList_Draw, birdSkill, cflap, mDC, birdX, birdY, ILD_TRANSPARENT;new
+    .else
         invoke ImageList_Draw, birdIml, cflap, mDC, birdX, birdY, ILD_TRANSPARENT;new
     .endif
 	
@@ -649,6 +659,8 @@ PaintBoard2 proc uses ebx esi,hWin:HWND,hDC:HDC
 
     .if indebuf2 ==1
         invoke ImageList_Draw, birdIml4, cflap, mDC, birdX2, birdY2, ILD_TRANSPARENT;new
+    .elseif inFinSkill2
+        invoke ImageList_Draw, birdSkill, cflap, mDC, birdX2, birdY2, ILD_TRANSPARENT;new
     .elseif indebuf2==0
         invoke ImageList_Draw, birdIml2, cflap, mDC, birdX2, birdY2, ILD_TRANSPARENT;new
     .endif
@@ -707,14 +719,14 @@ DeBuff2 proc target:dword
     .if target==1 
         mov indebuf,1  ;debuf标记置位
         mov speed, 5   ;加速
-        mov gravityAc, 3 ;增加重力
+        mov gravityAc, 2 ;增加重力
         mov jumpAc, -13  ;减少跳跃力度
     .endif
 
     .if target==2 
         mov indebuf2,1
         mov speed2, 5
-        mov gravityAc2, 3 ;增加重力
+        mov gravityAc2, 2 ;增加重力
         mov jumpAc2, -13  ;减少跳跃力度
     .endif
     ret
