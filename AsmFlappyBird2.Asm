@@ -349,7 +349,7 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
         
         ; 打印当前分数
 	    mov		wRect.left,0
-	    mov		wRect.top,125
+	    mov		wRect.top,110
 	    mov		wRect.right,288
 	    mov		wRect.bottom,515
 	    invoke SetBkMode,mDC,TRANSPARENT	    
@@ -395,12 +395,12 @@ PaintBoard proc uses ebx esi edx,hWin:HWND,hDC:HDC
         sub		wRect.top,15
         invoke wsprintfA,addr buffer,offset speedStr,speed
 	    invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER
-        ; debug
-        sub		wRect.top,15
-        mov ecx, inFinSkill
-        sar ecx, 1
-        invoke wsprintfA,addr buffer,offset DebugFinSkillStr, ecx
-	    invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER
+        ; ; debug
+        ; sub		wRect.top,15
+        ; mov ecx, inFinSkill
+        ; sar ecx, 1
+        ; invoke wsprintfA,addr buffer,offset DebugFinSkillStr, ecx
+	    ; invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER
 	    ; invoke SetTextColor,mDC,0000000h
 	    ; mov		wRect.top,49
 	    ; mov		wRect.right,286
@@ -564,7 +564,7 @@ PaintBoard2 proc uses ebx esi,hWin:HWND,hDC:HDC
         
         ; 打印当前分数
 	    mov		wRect.left,0
-	    mov		wRect.top,125
+	    mov		wRect.top,110
 	    mov		wRect.right,288
 	    mov		wRect.bottom,515
 	    invoke SetBkMode,mDC,TRANSPARENT
@@ -610,12 +610,12 @@ PaintBoard2 proc uses ebx esi,hWin:HWND,hDC:HDC
         sub		wRect.top,15
         invoke wsprintfA,addr buffer,offset speedStr,speed2
 	    invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER
-        ; debug
-        sub		wRect.top,15
-        mov ecx, inFinSkill2
-        sar ecx, 1
-        invoke wsprintfA,addr buffer,offset DebugFinSkillStr, ecx
-	    invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER
+        ; ; debug
+        ; sub		wRect.top,15
+        ; mov ecx, inFinSkill2
+        ; sar ecx, 1
+        ; invoke wsprintfA,addr buffer,offset DebugFinSkillStr, ecx
+	    ; invoke DrawText,mDC,addr buffer,-1,addr wRect,DT_CENTER
 	    
         ; invoke SetTextColor,mDC,0000000h
 	    ; mov		wRect.top,49
@@ -708,14 +708,14 @@ DeBuff2 proc target:dword
         mov indebuf,1  ;debuf标记置位
         mov speed, 5   ;加速
         mov gravityAc, 3 ;增加重力
-        mov jumpAc, -12  ;减少跳跃力度
+        mov jumpAc, -13  ;减少跳跃力度
     .endif
 
     .if target==2 
         mov indebuf2,1
         mov speed2, 5
         mov gravityAc2, 3 ;增加重力
-        mov jumpAc2, -12  ;减少跳跃力度
+        mov jumpAc2, -13  ;减少跳跃力度
     .endif
     ret
 DeBuff2 endp
