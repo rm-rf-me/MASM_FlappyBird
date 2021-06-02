@@ -909,7 +909,7 @@ InitParam proc
     mov NormSpeed, 4
     mov NormAravityAc, 2
     mov NormJumpAc, -14
-    mov birdLife, 300
+    mov birdLife, 5
     mov birdLife2, 300
     mov speed, 4
     mov speed2, 4
@@ -929,6 +929,10 @@ InitParam proc
     mov FinDisturb2, 0
     mov inFinSkill, 0
     mov inFinSkill2, 0
+    mov totPoint, 0
+    mov totPoint2, 0
+    mov maxPoint, 0
+    mov maxPoint2, 0
 
     mov indebuf,0
     mov indebuf2,0
